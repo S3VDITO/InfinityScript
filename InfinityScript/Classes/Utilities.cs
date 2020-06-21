@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Text.RegularExpressions;
-
-namespace InfinityScript
+﻿namespace InfinityScript
 {
     public static class Utilities
     {
@@ -45,7 +38,7 @@ namespace InfinityScript
         public static void GameSendServerCommand(this Entity ent, int id, string message) =>
             GameInterface.SV_GameSendServerCommand(ent.EntRef, id, message);
 
-        public static bool isEntDefined(Entity ent) =>
+        public static bool IsEntDefined(Entity ent) =>
             ent != null && GSCFunctions.GetEntByNum(ent.EntRef) != null;
 
         public static void PrintToConsole(string text) =>

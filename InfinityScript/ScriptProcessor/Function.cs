@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace InfinityScript
+﻿namespace InfinityScript
 {
     internal static class Function
     {
@@ -39,8 +34,7 @@ namespace InfinityScript
                         _returnValue = GameInterface.Script_GetString(0);
                         break;
                     case VariableType.Vector:
-                        Vector3 vector;
-                        GameInterface.Script_GetVector(0, out vector);
+                        GameInterface.Script_GetVector(0, out Vector3 vector);
                         _returnValue = vector;
                         break;
                     case VariableType.Float:

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace InfinityScript
 {
@@ -172,12 +169,12 @@ namespace InfinityScript
             bool eat = false;
             try
             {
-                string playerName = connectString.Split(new string[] { "name" }, StringSplitOptions.None)[1];
-                string playerHWID = connectString.Split(new string[] { "HWID" }, StringSplitOptions.None)[1];
-                string playerXUID = connectString.Split(new string[] { "XUID" }, StringSplitOptions.None)[1];
-                string playerIP = connectString.Split(new string[] { "IP-string" }, StringSplitOptions.None)[1];
-                string playerSID = connectString.Split(new string[] { "steamid" }, StringSplitOptions.None)[1];
-                string playerXNA = connectString.Split(new string[] { "xnaddr" }, StringSplitOptions.None)[1];
+                string playerName = connectString.Split(new [] { "name" }, StringSplitOptions.None)[1];
+                string playerHWID = connectString.Split(new [] { "HWID" }, StringSplitOptions.None)[1];
+                string playerXUID = connectString.Split(new [] { "XUID" }, StringSplitOptions.None)[1];
+                string playerIP = connectString.Split(new [] { "IP-string" }, StringSplitOptions.None)[1];
+                string playerSID = connectString.Split(new [] { "steamid" }, StringSplitOptions.None)[1];
+                string playerXNA = connectString.Split(new [] { "xnaddr" }, StringSplitOptions.None)[1];
 
                 ScriptProcessor.RunAll(script =>
                 {
@@ -214,8 +211,7 @@ namespace InfinityScript
                         obj = GameInterface.Script_GetString(i);
                         break;
                     case VariableType.Vector:
-                        Vector3 vector;
-                        GameInterface.Script_GetVector(i, out vector);
+                        GameInterface.Script_GetVector(i, out var vector);
                         obj = vector;
                         break;
                     case VariableType.Float:

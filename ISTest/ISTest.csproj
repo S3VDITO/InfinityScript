@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{4EF51766-C56F-43F6-9902-D997799B1E3B}</ProjectGuid>
+    <ProjectGuid>{3F7FE93F-020D-4A95-9A22-47CFCEFC1666}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>InfinityScript</RootNamespace>
-    <AssemblyName>InfinityScript</AssemblyName>
+    <RootNamespace>ISTest</RootNamespace>
+    <AssemblyName>ISTest</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,8 +21,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,7 +29,6 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -44,32 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Base\GameInterface.cs" />
-    <Compile Include="Base\Log.cs" />
-    <Compile Include="Base\Logging\ConsoleLogListener.cs" />
-    <Compile Include="Base\Logging\FileLogListener.cs" />
-    <Compile Include="Base\Logging\GameLogListener.cs" />
-    <Compile Include="Base\Logging\ILogListener.cs" />
-    <Compile Include="Base\Logging\LogLevel.cs" />
-    <Compile Include="Base\Logging\TraceLogListener.cs" />
-    <Compile Include="Base\SHManager.cs" />
-    <Compile Include="Base\Vector3.cs" />
-    <Compile Include="Classes\BaseScript.cs" />
-    <Compile Include="Classes\Entity.cs" />
-    <Compile Include="Classes\HudElem.cs" />
-    <Compile Include="Classes\Utilities.cs" />
+    <Compile Include="ISTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScriptProcessor\Function.cs" />
-    <Compile Include="ScriptProcessor\GSCFunctions.cs" />
-    <Compile Include="ScriptProcessor\Coroutine.cs" />
-    <Compile Include="ScriptProcessor\Notifiable.cs" />
-    <Compile Include="ScriptProcessor\Parameter.cs" />
-    <Compile Include="ScriptProcessor\ScriptLoader.cs" />
-    <Compile Include="ScriptProcessor\ScriptNames.cs" />
-    <Compile Include="ScriptProcessor\ScriptProcessor.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Scripts\" />
+    <ProjectReference Include="..\InfinityScript\InfinityScript.csproj">
+      <Project>{4ef51766-c56f-43f6-9902-d997799b1e3b}</Project>
+      <Name>InfinityScript</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

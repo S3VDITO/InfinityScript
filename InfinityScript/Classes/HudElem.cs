@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace InfinityScript
 {
@@ -39,10 +37,8 @@ namespace InfinityScript
             Children = new List<HudElem>();
         }
 
-        public static HudElem GetHudElem(int entRef)
-        {
-            return new HudElem(new Entity(entRef));
-        }
+        public static HudElem GetHudElem(int entRef) => 
+            new HudElem(new Entity(entRef));
 
         public float X
         {
@@ -66,77 +62,49 @@ namespace InfinityScript
         {
             get
             {
-                switch (Entity)
-                {
-                    case null:
-                        return 0.0f;
-                    default:
-                        return Entity.GetField(1) != null ? (float)Entity.GetField(1) : 0.0f;
-                }
+                if (Entity == null)
+                    return 0.0f;
+
+                return (float)Entity.GetField(1);
             }
-            set
-            {
-                Entity.SetField(1, value);
-            }
+            set => Entity.SetField(1, value);
         }
 
         public float Z
         {
             get
             {
-                switch (Entity)
-                {
-                    case null:
-                        return 0.0f;
-                    default:
-                        return Entity.GetField(2) != null ? (float)Entity.GetField(2) : 0.0f;
-                }
+                if (Entity == null)
+                    return 0.0f;
+
+                return (float)Entity.GetField(2);
             }
-            set
-            {
-                Entity.SetField(2, value);
-            }
+            set => Entity.SetField(2, value);
         }
 
         public float FontScale
         {
             get
             {
-                switch (Entity)
-                {
-                    case null:
-                        return 0.0f;
-                    default:
-                        return Entity.GetField(3) != null ? (float)Entity.GetField(3) : 0.0f;
-                }
+                if (Entity == null)
+                    return 0.0f;
+
+                return (float)Entity.GetField(3);
             }
-            set
-            {
-                Entity.SetField(3, value);
-            }
+            set => Entity.SetField(3, value);
         }
 
         public Fonts Font
         {
-            get
-            {
-                Fonts result;
-                return Entity.GetField(4) == null || !Enum.TryParse((string)Entity.GetField(4), out result) ? Fonts.Default : result;
-            }
-            set
-            {
-                Entity.SetField(4, value.ToString().ToLowerInvariant());
-            }
+            get => Entity.GetField(4) == null || !Enum.TryParse((string)Entity.GetField(4), out Fonts result) ? Fonts.Default : result;
+            set => Entity.SetField(4, value.ToString().ToLowerInvariant());
         }
 
         public XAlignments AlignX
         {
             get
             {
-                if (Entity == null)
-                    return XAlignments.Center;
-
-                if (Entity.GetField(5) == null)
+                if (Entity?.GetField(5) == null)
                     return XAlignments.Center;
 
                 string lowerInvariant = ((string)Entity.GetField(5)).ToLowerInvariant();
@@ -146,20 +114,14 @@ namespace InfinityScript
 
                 return lowerInvariant == "right" ? XAlignments.Right : XAlignments.Center;
             }
-            set
-            {
-                Entity.SetField(5, value.ToString().ToLowerInvariant());
-            }
+            set => Entity.SetField(5, value.ToString().ToLowerInvariant());
         }
 
         public YAlignments AlignY
         {
             get
             {
-                if (Entity == null)
-                    return YAlignments.Middle;
-
-                if (Entity.GetField(6) == null)
+                if (Entity?.GetField(6) == null)
                     return YAlignments.Middle;
 
                 string lowerInvariant = ((string)Entity.GetField(6)).ToLowerInvariant();
@@ -169,20 +131,14 @@ namespace InfinityScript
 
                 return lowerInvariant == "bottom" ? YAlignments.Bottom : YAlignments.Middle;
             }
-            set
-            {
-                Entity.SetField(6, value.ToString().ToLowerInvariant());
-            }
+            set => Entity.SetField(6, value.ToString().ToLowerInvariant());
         }
 
         public HorzAlignments HorzAlign
         {
             get
             {
-                if (Entity == null)
-                    return HorzAlignments.NoScale;
-
-                if (Entity.GetField(7) == null)
+                if (Entity?.GetField(7) == null)
                     return HorzAlignments.NoScale;
 
                 switch (((string)Entity.GetField(7)).ToLowerInvariant())
@@ -211,10 +167,7 @@ namespace InfinityScript
                         return HorzAlignments.NoScale;
                 }
             }
-            set
-            {
-                Entity.SetField(7, value.ToString().ToLowerInvariant());
-            }
+            set => Entity.SetField(7, value.ToString().ToLowerInvariant());
         }
 
         public VertAlignments VertAlign
@@ -253,182 +206,95 @@ namespace InfinityScript
                         return VertAlignments.NoScale;
                 }
             }
-            set
-            {
-                Entity.SetField(8, value.ToString().ToLowerInvariant());
-            }
+            set => Entity.SetField(8, value.ToString().ToLowerInvariant());
         }
 
         public float Alpha
         {
-            get
-            {
-                return Entity.GetField(10) == null ? 0.0f : (float)Entity.GetField(10);
-            }
-            set
-            {
-                Entity.SetField(10, value);
-            }
+            get => (float)Entity.GetField(10);
+            set => Entity.SetField(10, value);
         }
 
         public float GlowAlpha
         {
-            get
-            {
-                return Entity.GetField(18) == null ? 0.0f : (float)Entity.GetField(18);
-            }
-            set
-            {
-                Entity.SetField(18, value);
-            }
+            get => (float)Entity.GetField(18);
+            set => Entity.SetField(18, value);
         }
 
         public int Sort
         {
-            get
-            {
-                return Entity.GetField(12) == null ? 0 : (int)Entity.GetField(12);
-            }
-            set
-            {
-                Entity.SetField(12, value);
-            }
+            get => (int)Entity.GetField(12);
+            set => Entity.SetField(12, value);
         }
 
         public bool HideWhenInMenu
         {
-            get
-            {
-                return Entity.GetField(16) != null && (int)Entity.GetField(16) > 0;
-            }
-            set
-            {
-                Entity.SetField(16, value);
-            }
+            get => (int)Entity.GetField(16) > 0;
+            set => Entity.SetField(16, value);
         }
 
         public bool LowResBackground
         {
-            get
-            {
-                return Entity.GetField(14) != null && (int)Entity.GetField(14) > 0;
-            }
-            set
-            {
-                Entity.SetField(14, value);
-            }
+            get => (int)Entity.GetField(14) > 0;
+            set => Entity.SetField(14, value);
         }
 
         public bool HideWhenDead
         {
-            get
-            {
-                return Entity.GetField(15) != null && (int)Entity.GetField(15) > 0;
-            }
-            set
-            {
-                Entity.SetField(15, value);
-            }
+            get => (int)Entity.GetField(15) > 0;
+            set => Entity.SetField(15, value);
         }
 
         public bool HideIn3rdPerson
         {
-            get
-            {
-                return Entity.GetField(20) != null && (int)Entity.GetField(20) > 0;
-            }
-            set
-            {
-                Entity.SetField(20, value);
-            }
+            get => (int)Entity.GetField(20) > 0;
+            set => Entity.SetField(20, value);
         }
 
         public bool HideWhenInDemo
         {
-            get
-            {
-                return Entity.GetField(21) != null && (int)Entity.GetField(21) > 0;
-            }
-            set
-            {
-                Entity.SetField(21, value);
-            }
+            get => (int)Entity.GetField(21) > 0;
+            set => Entity.SetField(21, value);
         }
 
         public bool Archived
         {
-            get
-            {
-                return Entity.GetField(19) != null && (int)Entity.GetField(19) > 0;
-            }
-            set
-            {
-                Entity.SetField(19, value);
-            }
+            get => (int)Entity.GetField(19) > 0;
+            set => Entity.SetField(19, value);
         }
 
         public bool Foreground
         {
-            get
-            {
-                return Entity.GetField(13) != null && (int)Entity.GetField(13) > 0;
-            }
-            set
-            {
-                Entity.SetField(13, value);
-            }
+            get => (int)Entity.GetField(13) > 0;
+            set => Entity.SetField(13, value);
         }
 
         public Vector3 Color
         {
-            get
-            {
-                return Entity.GetField(9) == null ? Vector3.Zero : Entity.GetField(9).As<Vector3>();
-            }
-            set
-            {
-                Entity.SetField(9, value);
-            }
+            get => Entity.GetField(9).As<Vector3>();
+            set => Entity.SetField(9, value);
         }
 
         public Vector3 GlowColor
         {
-            get
-            {
-                return Entity.GetField(17) == null ? Vector3.Zero : Entity.GetField(17).As<Vector3>();
-            }
-            set
-            {
-                Entity.SetField(17, value);
-            }
+            get => Entity.GetField(17).As<Vector3>();
+            set => Entity.SetField(17, value);
         }
 
         public string Label
         {
-            get
-            {
-                return Entity.GetField(11) == null ? "" : (string)Entity.GetField(11);
-            }
-            set
-            {
-                Entity.SetField(11, value);
-            }
+            get => (string)Entity.GetField(11);
+            set => Entity.SetField(11, value);
         }
 
-        public Parameter GetField(string name)
-        {
-            return Entity.GetField(name);
-        }
+        public Parameter GetField(string name) => 
+            Entity.GetField(name);
 
-        public Parameter GetField(int index)
-        {
-            return Entity.GetField(index);
-        }
+        public Parameter GetField(int index) => 
+            Entity.GetField(index);
 
-        public void SetField(string name, Parameter value)
-        {
+        public void SetField(string name, Parameter value) => 
             Entity.SetField(name, value);
-        }
 
         public static HudElem CreateFontString(Entity client, Fonts font, float fontScale)
         {
@@ -442,7 +308,7 @@ namespace InfinityScript
             return hudElem;
         }
 
-        public static HudElem CreateServerFontString(HudElem.Fonts font, float fontScale)
+        public static HudElem CreateServerFontString(Fonts font, float fontScale)
         {
             HudElem hudElem = GSCFunctions.NewHudElem();
             hudElem.Font = font;
@@ -474,38 +340,26 @@ namespace InfinityScript
 
         public HudElem Parent
         {
-            get
-            {
-                return _parent;
-            }
+            get => _parent;
             set
             {
-                if (_parent != null)
-                    _parent.Children.Remove(this);
+                _parent?.Children.Remove(this);
                 _parent = value;
                 _parent.Children.Add(this);
             }
         }
 
-        public void SetPoint(string point)
-        {
+        public void SetPoint(string point) =>
             SetPoint(point, point, 0, 0, 0);
-        }
 
-        public void SetPoint(string point, string relativePoint)
-        {
+        public void SetPoint(string point, string relativePoint) =>
             SetPoint(point, relativePoint, 0, 0, 0);
-        }
 
-        public void SetPoint(string point, string relativePoint, int xOffset)
-        {
+        public void SetPoint(string point, string relativePoint, int xOffset) =>
             SetPoint(point, relativePoint, xOffset, 0, 0);
-        }
 
-        public void SetPoint(string point, string relativePoint, int xOffset, int yOffset)
-        {
+        public void SetPoint(string point, string relativePoint, int xOffset, int yOffset) =>
             SetPoint(point, relativePoint, xOffset, yOffset, 0);
-        }
 
         public void SetPoint(string point, string relativePoint, int xOffset, int yOffset, float moveTime)
         {
@@ -600,8 +454,6 @@ namespace InfinityScript
             X += _xOffset;
             Y += _yOffset;
 
-            // setpointbar stuff
-
             UpdateChildren();
         }
 
@@ -617,10 +469,7 @@ namespace InfinityScript
 
         public string Shader
         {
-            get
-            {
-                return _shader;
-            }
+            get => _shader;
             set
             {
                 this.SetShader(value, 64, 64);

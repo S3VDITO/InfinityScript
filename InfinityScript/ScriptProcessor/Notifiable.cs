@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace InfinityScript
 {
@@ -23,8 +21,6 @@ namespace InfinityScript
 
         public static event Action<int, string, Parameter[]> Notified;
 
-        public event Action<string> WaitTillEvents;
-
         internal void ProcessNotifications()
         {
             NotifyData[] array = _pendingNotifys.ToArray();
@@ -32,7 +28,6 @@ namespace InfinityScript
             foreach (NotifyData notifyData in array)
             {
                 Notified?.Invoke(notifyData.entity, notifyData.type, notifyData.parameters);
-                WaitTillEvents?.Invoke(notifyData.type);
 
                 if (_notifyHandlers.ContainsKey(notifyData.type))
                 {
@@ -53,7 +48,7 @@ namespace InfinityScript
                         }
                         catch (Exception ex)
                         {
-                            Log.Write(LogLevel.Error, "Exception during handling of notify event {0} on {1}: {2}", (object)notifyData.type, (object)this, ex.InnerException != null ? (object)ex.InnerException.ToString() : (object)ex.ToString());
+                            Log.Write(LogLevel.Error, "Exception during handling of notify event {0} on {1}: {2}", notifyData.type, this, ex.InnerException != null ? ex.InnerException.Message : ex.Message);
                         }
                     }
                 }
@@ -88,7 +83,7 @@ namespace InfinityScript
                     {
                         Log.Write(LogLevel.Error, "Error during handling timer in script {0}: {1}",
                             GetType().Name,
-                            ex.InnerException != null ? ex.InnerException.ToString() : ex.ToString());
+                            ex.InnerException != null ? ex.InnerException.Message : ex.Message);
 
                         _timers.Remove(scriptTimer);
                     }
@@ -98,7 +93,7 @@ namespace InfinityScript
 
         internal void HandleNotify(int entity, string type, Parameter[] paras)
         {
-            if (WaitTillEvents == null && Notified == null && !this._notifyHandlers.ContainsKey(type))
+            if (Notified == null && !_notifyHandlers.ContainsKey(type))
                 return;
 
             _pendingNotifys.Add(new NotifyData()

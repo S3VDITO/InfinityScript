@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace InfinityScript
 {
@@ -10,7 +9,7 @@ namespace InfinityScript
         public static bool AnimHasNoteTrack(string animation, string noteTrackName)
         {
             Function.Call(ScriptNames.FunctionList.animhasnotetrack, animation, noteTrackName);
-            return (uint)Convert.ToInt32(Function.GetReturns()) > 0U;
+            return Convert.ToInt32(Function.GetReturns()) > 0;
         }
 
         public static float GetAngleDelta(string animation, float startTime = 0.0f, float endTime = 1f)
@@ -86,9 +85,9 @@ namespace InfinityScript
             Function.Call(ScriptNames.FunctionList.allclientsprint, message);
         }
 
-        public static void AllowSpectateTeam(this Entity entref, string team, bool canSpectate)
+        public static void AllowSpectateTeam(this Entity player, string team, bool canSpectate)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.allowspectateteam, team, canSpectate);
         }
 
@@ -97,33 +96,33 @@ namespace InfinityScript
             Function.Call(ScriptNames.FunctionList.announcement, message);
         }
 
-        public static void BeginLocationSelection(this Entity entref, string locationSelector)
+        public static void BeginLocationSelection(this Entity player, string locationSelector)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.beginlocationselection, locationSelector);
         }
 
-        public static void BeginLocationSelection(this Entity entref, string locationSelector, float selectorSize)
+        public static void BeginLocationSelection(this Entity player, string locationSelector, float selectorSize)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.beginlocationselection, locationSelector, selectorSize);
         }
 
-        public static void ClientAnnouncement(this Entity entref, string message)
+        public static void ClientAnnouncement(this Entity player, string message)
         {
-            Function.SetEntRef(entref.EntRef);
-            Function.Call(ScriptNames.FunctionList.clientannouncement, entref, message);
+            Function.SetEntRef(player.EntRef);
+            Function.Call(ScriptNames.FunctionList.clientannouncement, player, message);
         }
 
-        public static void ClientPrint(this Entity entref, string message)
+        public static void ClientPrint(this Entity player, string message)
         {
-            Function.SetEntRef(entref.EntRef);
-            Function.Call(ScriptNames.FunctionList.clientprint, entref, message);
+            Function.SetEntRef(player.EntRef);
+            Function.Call(ScriptNames.FunctionList.clientprint, player, message);
         }
 
-        public static Entity ClonePlayer(this Entity entref, int duration = -1)
+        public static Entity ClonePlayer(this Entity player, int duration = -1)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             if (duration != -1)
                 Function.Call(ScriptNames.FunctionList.cloneplayer, duration);
             else
@@ -131,48 +130,48 @@ namespace InfinityScript
             return (Entity)Function.GetReturns();
         }
 
-        public static void DisableWeapons(this Entity entref)
+        public static void DisableWeapons(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.disableweapons);
         }
 
-        public static Entity DropItem(this Entity entref, string itemName)
+        public static Entity DropItem(this Entity player, string itemName)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.dropitem, itemName);
             return (Entity)Function.GetReturns();
         }
 
-        public static void EnableWeapons(this Entity entref)
+        public static void EnableWeapons(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.enableweapons);
         }
 
-        public static void EndLocationSelection(this Entity entref)
+        public static void EndLocationSelection(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.endlocationselection);
         }
 
-        public static string GetViewmodel(this Entity entref)
+        public static string GetViewmodel(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.getviewmodel);
             return (string)Function.GetReturns();
         }
 
-        public static bool IsMantling(this Entity entref)
+        public static bool IsMantling(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.ismantling);
             return (uint)Convert.ToInt32(Function.GetReturns()) > 0U;
         }
 
-        public static bool IsOnLadder(this Entity entref)
+        public static bool IsOnLadder(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.isonladder);
             return (uint)Convert.ToInt32(Function.GetReturns()) > 0U;
         }
@@ -184,24 +183,24 @@ namespace InfinityScript
             return (uint)Convert.ToInt32(Function.GetReturns()) > 0U;
         }
 
-        public static bool IsRagdoll(this Entity entref)
+        public static bool IsRagdoll(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.isragdoll);
             return (uint)Convert.ToInt32(Function.GetReturns()) > 0U;
         }
 
-        public static bool IsTalking(this Entity entref)
+        public static bool IsTalking(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.istalking);
             return (uint)Convert.ToInt32(Function.GetReturns()) > 0U;
         }
 
-        public static void Kick(this Entity entref)
+        public static void Kick(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
-            Function.Call(ScriptNames.FunctionList.kick, entref);
+            Function.SetEntRef(player.EntRef);
+            Function.Call(ScriptNames.FunctionList.kick, player);
         }
 
         public static void MakeDvarServerInfo(string dvar, Parameter value)
@@ -209,21 +208,21 @@ namespace InfinityScript
             Function.Call(ScriptNames.FunctionList.makedvarserverinfo, dvar, value);
         }
 
-        public static void SayAll(this Entity entref, string message)
+        public static void SayAll(this Entity player, string message)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.sayall, message);
         }
 
-        public static void SayTeam(this Entity entref, string message)
+        public static void SayTeam(this Entity player, string message)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.sayteam, message);
         }
 
-        public static void SetRank(this Entity entref, int rank, int? prestige = null)
+        public static void SetRank(this Entity player, int rank, int? prestige = null)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             if (prestige.HasValue)
             {
                 int? nullable = prestige;
@@ -233,9 +232,9 @@ namespace InfinityScript
                 Function.Call(ScriptNames.FunctionList.setrank, rank);
         }
 
-        public static void SetSpawnWeapon(this Entity entref, string weapon)
+        public static void SetSpawnWeapon(this Entity player, string weapon)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.setspawnweapon, weapon);
         }
 
@@ -245,9 +244,9 @@ namespace InfinityScript
             Function.Call(ScriptNames.FunctionList.setteamfortrigger, team);
         }
 
-        public static void ShowScoreBoard(this Entity entref)
+        public static void ShowScoreBoard(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.showscoreboard);
         }
 
@@ -257,27 +256,27 @@ namespace InfinityScript
             Function.Call(ScriptNames.FunctionList.startragdoll);
         }
 
-        public static void Suicide(this Entity entref)
+        public static void Suicide(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.suicide);
         }
 
-        public static void UpdateDMScores(this Entity entref)
+        public static void UpdateDMScores(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.updatedmscores);
         }
 
-        public static void UpdateScores(this Entity entref)
+        public static void UpdateScores(this Entity player)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             Function.Call(ScriptNames.FunctionList.updatescores);
         }
 
-        public static void FinishPlayerDamage(this Entity entref, Entity inflictor, Entity attacker, int damage, int damageFlags, string meansOfDeath, string weapon, Vector3 point, Vector3 direction, string hitLocation, float offsetTime)
+        public static void FinishPlayerDamage(this Entity player, Entity inflictor, Entity attacker, int damage, int damageFlags, string meansOfDeath, string weapon, Vector3 point, Vector3 direction, string hitLocation, float offsetTime)
         {
-            Function.SetEntRef(entref.EntRef);
+            Function.SetEntRef(player.EntRef);
             if (inflictor == null && attacker != null)
                 Function.Call(ScriptNames.FunctionList.finishplayerdamage, string.Empty, attacker, damage, damageFlags, meansOfDeath, weapon, point, direction, hitLocation, offsetTime);
             else if (attacker == null && inflictor != null)
@@ -633,7 +632,7 @@ namespace InfinityScript
 
         public static void Delete(this Entity entity)
         {
-            if (!Utilities.isEntDefined(entity))
+            if (!Utilities.IsEntDefined(entity))
                 return;
             Function.SetEntRef(entity.EntRef);
             Function.Call(ScriptNames.FunctionList.delete);

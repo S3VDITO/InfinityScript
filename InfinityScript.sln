@@ -5,6 +5,8 @@ VisualStudioVersion = 16.0.30128.74
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfinityScript", "InfinityScript\InfinityScript.csproj", "{4EF51766-C56F-43F6-9902-D997799B1E3B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ISTest", "ISTest\ISTest.csproj", "{3F7FE93F-020D-4A95-9A22-47CFCEFC1666}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{4EF51766-C56F-43F6-9902-D997799B1E3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EF51766-C56F-43F6-9902-D997799B1E3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4EF51766-C56F-43F6-9902-D997799B1E3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3F7FE93F-020D-4A95-9A22-47CFCEFC1666}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3F7FE93F-020D-4A95-9A22-47CFCEFC1666}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3F7FE93F-020D-4A95-9A22-47CFCEFC1666}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3F7FE93F-020D-4A95-9A22-47CFCEFC1666}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

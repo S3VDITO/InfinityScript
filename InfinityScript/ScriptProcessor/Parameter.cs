@@ -1,77 +1,55 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-
 namespace InfinityScript
 {
     public class Parameter
     {
-        private VariableType _type;
-        private object _value;
+        internal object InternalValue { get; }
 
-        internal object InternalValue
-        {
-            get
-            {
-                return this._value;
-            }
-        }
-
-        public VariableType Type
-        {
-            get
-            {
-                return this._type;
-            }
-        }
+        public VariableType Type { get; }
 
         internal Parameter(VariableType type, object value)
         {
-            this._type = type;
-            this._value = value;
+            Type = type;
+            InternalValue = value;
         }
 
         public static explicit operator int(Parameter p)
         {
-            return Convert.ToInt32(p._value);
+            return Convert.ToInt32(p.InternalValue);
         }
 
         public static explicit operator bool(Parameter p)
         {
-            return (uint)Convert.ToInt32(p._value) > 0U;
+            return Convert.ToInt32(p.InternalValue) > 0;
         }
 
         public static explicit operator float(Parameter p)
         {
-            return Convert.ToSingle(p._value);
+            return Convert.ToSingle(p.InternalValue);
         }
 
         public static explicit operator string(Parameter p)
         {
-            return Convert.ToString(p._value);
+            return Convert.ToString(p.InternalValue);
         }
 
         public static explicit operator Entity(Parameter p)
         {
-            return (Entity)p._value;
+            return (Entity)p.InternalValue;
         }
 
         public static explicit operator HudElem(Parameter p)
         {
-            return (HudElem)p._value;
+            return (HudElem)p.InternalValue;
         }
 
-        public T As<T>()
-        {
-            return (T)Convert.ChangeType(this._value, typeof(T));
-        }
+        public T As<T>() => 
+            (T)Convert.ChangeType(InternalValue, typeof(T));
 
         public Parameter(string v)
         {
-            this._type = VariableType.String;
-            this._value = (object)v;
+            Type = VariableType.String;
+            InternalValue = v;
         }
 
         public static implicit operator Parameter(string v)
@@ -81,8 +59,8 @@ namespace InfinityScript
 
         public Parameter(int v)
         {
-            this._type = VariableType.Integer;
-            this._value = (object)v;
+            Type = VariableType.Integer;
+            InternalValue = v;
         }
 
         public static implicit operator Parameter(int v)
@@ -92,8 +70,8 @@ namespace InfinityScript
 
         public Parameter(float v)
         {
-            this._type = VariableType.Float;
-            this._value = (object)v;
+            Type = VariableType.Float;
+            InternalValue = v;
         }
 
         public static implicit operator Parameter(float v)
@@ -103,8 +81,8 @@ namespace InfinityScript
 
         public Parameter(Vector3 v)
         {
-            this._type = VariableType.Vector;
-            this._value = (object)v;
+            Type = VariableType.Vector;
+            InternalValue = v;
         }
 
         public static implicit operator Parameter(Vector3 v)
@@ -114,8 +92,8 @@ namespace InfinityScript
 
         public Parameter(Entity v)
         {
-            this._type = VariableType.Entity;
-            this._value = (object)v;
+            Type = VariableType.Entity;
+            InternalValue = v;
         }
 
         public static implicit operator Parameter(Entity v)
@@ -125,8 +103,8 @@ namespace InfinityScript
 
         public Parameter(HudElem v)
         {
-            this._type = VariableType.Entity;
-            this._value = (object)v;
+            Type = VariableType.Entity;
+            InternalValue = v;
         }
 
         public static implicit operator Parameter(HudElem v)
@@ -141,44 +119,37 @@ namespace InfinityScript
 
         public Parameter(object v)
         {
-            this._value = v;
+            InternalValue = v;
         }
 
         internal void PushValue()
         {
-            switch (this._type)
+            switch (Type)
             {
                 case VariableType.Entity:
-                    GameInterface.Script_PushEntRef(((Entity)this._value).EntRef);
+                    GameInterface.Script_PushEntRef(((Entity)InternalValue).EntRef);
                     break;
                 case VariableType.String:
                 case VariableType.IString:
-                    GameInterface.Script_PushString(Convert.ToString(this._value));
+                    GameInterface.Script_PushString(Convert.ToString(InternalValue));
                     break;
                 case VariableType.Vector:
-                    Vector3 vector3 = (Vector3)this._value;
+                    Vector3 vector3 = (Vector3)InternalValue;
                     GameInterface.Script_PushVector(vector3.X, vector3.Y, vector3.Z);
                     break;
                 case VariableType.Float:
-                    GameInterface.Script_PushFloat(Convert.ToSingle(this._value));
+                    GameInterface.Script_PushFloat(Convert.ToSingle(InternalValue));
                     break;
                 case VariableType.Integer:
-                    GameInterface.Script_PushInt(Convert.ToInt32(this._value));
+                    GameInterface.Script_PushInt(Convert.ToInt32(InternalValue));
                     break;
             }
         }
 
-        public bool IsNull
-        {
-            get
-            {
-                return this._value == null;
-            }
-        }
+        public bool IsNull => 
+            InternalValue == null;
 
-        public override string ToString()
-        {
-            return this._value.ToString();
-        }
+        public override string ToString() =>
+            InternalValue.ToString();
     }
 }

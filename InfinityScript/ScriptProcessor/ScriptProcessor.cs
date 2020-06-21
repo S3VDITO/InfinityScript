@@ -5,16 +5,14 @@ namespace InfinityScript
 {
     internal static class ScriptProcessor
     {
-        internal static List<BaseScript> _scripts = new List<BaseScript>();
+        internal static List<BaseScript> Scripts = new List<BaseScript>();
 
-        public static void AddScript(BaseScript script)
-        {
-            _scripts.Add(script);
-        }
+        public static void AddScript(BaseScript script) => 
+            Scripts.Add(script);
 
         public static void RunAll(Action<BaseScript> cb)
         {
-            foreach (BaseScript baseScript in _scripts.ToArray())
+            foreach (BaseScript baseScript in Scripts.ToArray())
             {
                 try
                 {

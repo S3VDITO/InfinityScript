@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,8 +7,6 @@ namespace InfinityScript
 {
     public class ScriptLoader
     {
-        private static List<string> _loadedAssemblies = new List<string>();
-
         public static void Initialize()
         {
             LoadScripts();
@@ -17,7 +14,7 @@ namespace InfinityScript
 
         public static void LoadScripts()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(CurrentDomain_AssemblyResolve);
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
             LoadAssembly(Assembly.GetExecutingAssembly());
             LoadAssemblies("scripts", "*.auto.dll");
         }
@@ -32,7 +29,7 @@ namespace InfinityScript
                     {
                         byte[] numArray = new byte[fileStream.Length];
                         fileStream.Read(numArray, 0, numArray.Length);
-                        ScriptLoader.LoadAssembly(Assembly.Load(numArray));
+                        LoadAssembly(Assembly.Load(numArray));
                     }
                 }
                 catch (Exception ex)
@@ -79,11 +76,8 @@ namespace InfinityScript
             if (args.Name.Contains("CitizenSHManager"))
                 return Assembly.GetExecutingAssembly();
 
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                if (assembly.FullName == args.Name)
-                    return assembly;
-            }
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies().Where(_assembly => _assembly.FullName == args.Name))
+                return assembly;
 
             return null;
         }

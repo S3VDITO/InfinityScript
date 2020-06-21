@@ -62,7 +62,7 @@ namespace InfinityScript
             {
                 MethodBase method = frame.GetMethod();
                 Type declaringType = method.DeclaringType;
-                if (!(declaringType.Assembly.GetName().Name == "System") && !(declaringType.Name == nameof(Log)))
+                if (declaringType.Assembly.GetName().Name != "System" && declaringType.Name != nameof(Log))
                 {
                     string name = method.Name;
                     if (name == ".ctor")

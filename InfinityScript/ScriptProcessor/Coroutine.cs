@@ -1,164 +1,50 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 namespace InfinityScript
 {
     internal class Coroutine : Notifiable
     {
-        public static List<IEnumerator> routines = new List<IEnumerator>();
-        private static Dictionary<string, bool> Notifies = new Dictionary<string, bool>();
-        private static Dictionary<string[], bool> GroupedNotifies = new Dictionary<string[], bool>();
+        public static List<IEnumerator> Routines = new List<IEnumerator>();
 
-        public static bool stepForward()
+        public static bool StepForward(IEnumerator routine)
         {
             if (!Running)
                 return false;
+
+            if (!Routines.Contains(routine))
+                return false;
+
             try
             {
-                Update();
+                Update(routine);
             }
-            catch
+            catch(Exception ex)
             {
+                Utilities.PrintToConsole($"[InfinityScript] Exception coroutine: {ex.Message}");
                 return false;
             }
+
             return true;
         }
 
         private static void StopAll() =>
-            routines.Clear();
+            Routines.Clear();
 
-        private static void InternalWait(string notifyCheck, string notify, params Parameter[] par)
+        private static void Update(IEnumerator routine)
         {
-            if (notify != notifyCheck)
-                return;
-            Notifies[notify] = true;
-        }
-
-        private static void InternalWaitAll(string[] notifyCheck, string notify, params Parameter[] pars)
-        {
-            foreach (var _ in notifyCheck.Where(str => notify == str).Select(str => new { }))
-                GroupedNotifies[notifyCheck] = true;
-        }
-
-        internal static Action<string> addHandler(string notify)
-        {
-            Notifies.Add(notify, false);
-            return m => InternalWait(notify, m);
-        }
-
-        internal static void removeHandler(string notify) => 
-            Notifies.Remove(notify);
-
-        internal static void removeGroupHandlers(string[] notify) =>
-            GroupedNotifies.Remove(notify);
-
-        internal static Action<string> addGroupHandler(string[] notify)
-        {
-            GroupedNotifies.Add(notify, false);
-            return m => InternalWaitAll(notify, m);
-        }
-
-        public static bool checkStatus(string notify)
-        {
-            if (!Notifies[notify])
-                return false;
-            Notifies.Remove(notify);
-            return true;
-        }
-
-        public static bool checkGroupStatus(string[] notify)
-        {
-            if (!GroupedNotifies[notify])
-                return false;
-
-            GroupedNotifies.Remove(notify);
-            return true;
-        }
-
-        internal static IEnumerator WaitTill(Entity ent, string notify)
-        {
-            Notifies.Add(notify, false);
-            Action<int, string, Parameter[]> notifyWaiter = new Action<int, string, Parameter[]>((entRef, message, parameters) =>
-            {
-                if(entRef == ent.EntRef)
-                    InternalWait(notify, message, parameters);
-            });
-
-            Notified += notifyWaiter;
-
-            while (!Notifies[notify])
-                yield return 0;
-
-            removeHandler(notify);
-
-            Notified -= notifyWaiter;
-        }
-
-        public static IEnumerator WaitTill_any(Entity ent, params string[] notify)
-        {
-            GroupedNotifies.Add(notify, false);
-            Action<int, string, Parameter[]> notifyWaiter = new Action<int, string, Parameter[]>((entRef, message, parameters) =>
-            {
-                if (entRef == ent.EntRef)
-                    InternalWaitAll(notify, message, parameters);
-            });
-            Notified += notifyWaiter;
-            while (!GroupedNotifies[notify])
-                yield return 0;
-            removeGroupHandlers(notify);
-            Notified -= notifyWaiter;
-        }
-
-        public static IEnumerator WaitTill_notify_or_timeout(Entity ent, string notify, int time, Action<string> returnString = null)
-        {
-            Notifies.Add(notify, false);
-            Stopwatch watch = Stopwatch.StartNew();
-            Action<int, string, Parameter[]> notifyWaiter = new Action<int, string, Parameter[]>((entRef, message, parameters) =>
-            {
-                if (entRef == ent.EntRef)
-                    InternalWait(notify, message, parameters);
-            });
-            Notified += notifyWaiter;
-            TimeSpan elapsed;
-            while (!Notifies[notify])
-            {
-                elapsed = watch.Elapsed;
-                if (elapsed.TotalSeconds < time)
-                    yield return 0;
-                else
-                    break;
-            }
-            removeHandler(notify);
-            if (watch.IsRunning)
-                watch.Stop();
-            Notified -= notifyWaiter;
-            elapsed = watch.Elapsed;
-
-            if (elapsed.TotalSeconds >= time)
-                returnString?.Invoke("timeout");
-            else
-                returnString?.Invoke(notify);
-        }
-
-        private static void Update()
-        {
-            for (int index = 0; index < routines.Count; ++index)
-            {
-                if ((!(routines[index].Current is IEnumerator enumerator) || !MoveNext(enumerator)) && !routines[index].MoveNext())
-                    routines.RemoveAt(index--);
-            }
+            if ((!(routine.Current is IEnumerator enumerator) || !MoveNext(enumerator)) && !routine.MoveNext())
+                Routines.Remove(routine);
         }
 
         private static bool MoveNext(IEnumerator routine) =>
             routine.Current is IEnumerator enumerator && MoveNext(enumerator) || routine.MoveNext();
 
         internal static int Count =>
-            routines.Count;
+            Routines.Count;
 
         internal static bool Running =>
-            routines.Count > 0;
+            Routines.Count > 0;
     }
 }
