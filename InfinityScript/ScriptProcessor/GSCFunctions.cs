@@ -4528,9 +4528,9 @@ namespace InfinityScript
             throw new NotImplementedException();
         }
 
-        public static Vector3[] SortByDistance(Vector3[] array, Vector3 position)
+        public static Entity[] SortByDistance(Entity[] arrayEnts, Entity originEnt)
         {
-            return array.OrderBy(x => x.DistanceTo(position)).ToArray();
+            return arrayEnts.OrderBy(ent => ent.Origin.DistanceTo(originEnt.Origin)).ToArray();
         }
 
         public static Vector3 AnglesToForward(Vector3 angles)
