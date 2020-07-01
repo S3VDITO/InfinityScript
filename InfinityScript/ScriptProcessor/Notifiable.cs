@@ -6,11 +6,7 @@ namespace InfinityScript
 {
     public abstract class Notifiable
     {
-        internal static List<ScriptTimer> _timers = new List<ScriptTimer>();
-        private Dictionary<string, List<Delegate>> _notifyHandlers = new Dictionary<string, List<Delegate>>();
-        private List<NotifyData> _pendingNotifys = new List<NotifyData>();
-        internal static int _currentTime;
-
+        #region OnNotify funcs
         protected void OnNotifyInternal(string type, Delegate handler)
         {
             if (!_notifyHandlers.ContainsKey(type))
@@ -18,74 +14,52 @@ namespace InfinityScript
 
             _notifyHandlers[type].Add(handler);
         }
+        #endregion
+
+        private Dictionary<string, List<Delegate>> _notifyHandlers = new Dictionary<string, List<Delegate>>();
+        private List<NotifyData> _pendingNotifys = new List<NotifyData>();
+
+        private struct NotifyData
+        {
+            public int entity;
+            public string type;
+            public Parameter[] parameters;
+        }
 
         public static event Action<int, string, Parameter[]> Notified;
 
         internal void ProcessNotifications()
         {
-            NotifyData[] array = _pendingNotifys.ToArray();
+            var notifies = _pendingNotifys.ToArray();
             _pendingNotifys.Clear();
-            foreach (NotifyData notifyData in array)
-            {
-                Notified?.Invoke(notifyData.entity, notifyData.type, notifyData.parameters);
 
-                if (_notifyHandlers.ContainsKey(notifyData.type))
+            foreach (var notify in notifies)
+            {
+                Notified?.Invoke(notify.entity, notify.type, notify.parameters);
+
+                if (_notifyHandlers.ContainsKey(notify.type))
                 {
-                    foreach (Delegate @delegate in _notifyHandlers[notifyData.type])
+                    foreach (var handler in _notifyHandlers[notify.type])
                     {
                         try
                         {
-                            ParameterInfo[] parameters = @delegate.Method.GetParameters();
-                            if (parameters.Length != 0 && parameters[0].ParameterType == typeof(Entity))
+                            var parameters = handler.Method.GetParameters();
+
+                            if (parameters.Length > 0 && parameters[0].ParameterType == typeof(Entity))
                             {
-                                object[] objArray = new object[notifyData.parameters.Length + 1];
-                                objArray[0] = this is Entity ? (Entity)this : null;
-                                Array.Copy(notifyData.parameters, 0, objArray, 1, notifyData.parameters.Length);
-                                @delegate.DynamicInvoke(objArray);
+                                var newParameters = new object[notify.parameters.Length + 1];
+                                newParameters[0] = (this is Entity) ? (Entity)this : null;
+                                Array.Copy(notify.parameters, 0, newParameters, 1, notify.parameters.Length);
+
+                                handler.DynamicInvoke(newParameters);
                             }
                             else
-                                @delegate.DynamicInvoke(notifyData.parameters);
+                                handler.DynamicInvoke(notify.parameters);
                         }
                         catch (Exception ex)
                         {
-                            Log.Write(LogLevel.Error, "Exception during handling of notify event {0} on {1}: {2}", notifyData.type, this, ex.InnerException != null ? ex.InnerException.Message : ex.Message);
+                            Log.Write(LogLevel.Error, "Exception during handling of notify event {0} on {1}: {2}", notify.type, this, ex.InnerException != null ? ex.InnerException.Message : ex.Message);
                         }
-                    }
-                }
-            }
-        }
-
-        internal void ProcessTimers()
-        {
-            Function.SetEntRef(-1);
-            _currentTime = GSCFunctions.GetTime();
-            foreach (ScriptTimer scriptTimer in _timers.ToArray())
-            {
-                if (_currentTime >= scriptTimer.triggerTime)
-                {
-                    try
-                    {
-                        ParameterInfo[] parameters = scriptTimer.func.Method.GetParameters();
-                        Type returnType = scriptTimer.func.Method.ReturnType;
-                        object obj;
-                        if (parameters.Length != 0 && parameters[0].ParameterType == typeof(Entity))
-                            obj = scriptTimer.func.DynamicInvoke((object)this);
-                        else
-                            obj = scriptTimer.func.DynamicInvoke();
-                        if (returnType == typeof(bool) && !(bool)obj)
-                            _timers.Remove(scriptTimer);
-                        else if (scriptTimer.interval != -1)
-                            scriptTimer.triggerTime = _currentTime + scriptTimer.interval;
-                        else
-                            _timers.Remove(scriptTimer);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Write(LogLevel.Error, "Error during handling timer in script {0}: {1}",
-                            GetType().Name,
-                            ex.InnerException != null ? ex.InnerException.Message : ex.Message);
-
-                        _timers.Remove(scriptTimer);
                     }
                 }
             }
@@ -104,11 +78,51 @@ namespace InfinityScript
             });
         }
 
-        private struct NotifyData
+
+        #region ontimer
+        internal static List<ScriptTimer> _timers = new List<ScriptTimer>();
+        internal static int _currentTime;
+        internal void ProcessTimers()
         {
-            public int entity;
-            public string type;
-            public Parameter[] parameters;
+            Function.SetEntRef(-1);
+            _currentTime = GSCFunctions.GetTime();
+
+            var timers = _timers.ToArray();
+
+            foreach (var timer in timers)
+            {
+                if (_currentTime >= timer.triggerTime)
+                {
+                    try
+                    {
+                        var parameters = timer.func.Method.GetParameters();
+                        var returnType = timer.func.Method.ReturnType;
+                        object returnValue = null;
+
+                        if (parameters.Length > 0 && parameters[0].ParameterType == typeof(Entity))
+                            returnValue = timer.func.DynamicInvoke(this);
+                        else
+                            returnValue = timer.func.DynamicInvoke();
+
+                        if (returnType == typeof(bool) && (bool)returnValue == false)
+                        {
+                            _timers.Remove(timer);
+                            continue;
+                        }
+
+                        if (timer.interval != -1)
+                            timer.triggerTime = _currentTime + timer.interval;
+                        else
+                            _timers.Remove(timer);
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Write(LogLevel.Error, "Error during handling timer in script {0}: {1}", GetType().Name, (ex.InnerException != null) ? ex.InnerException.ToString() : ex.ToString());
+
+                        _timers.Remove(timer);
+                    }
+                }
+            }
         }
 
         internal class ScriptTimer
@@ -117,5 +131,6 @@ namespace InfinityScript
             public int triggerTime;
             public int interval;
         }
+        #endregion;
     }
 }

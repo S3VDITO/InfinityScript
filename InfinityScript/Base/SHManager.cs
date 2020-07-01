@@ -25,8 +25,8 @@ namespace InfinityScript
         {
             try
             {
-                Entity.RunAll(entity => entity.ProcessNotifications());
-                Entity.RunAll(entity => entity.ProcessTimers());
+                //Entity.RunAll(entity => entity.ProcessNotifications());
+                //Entity.RunAll(entity => entity.ProcessTimers());
                 ScriptProcessor.RunAll(script => script.RunFrame());
             }
             catch (Exception ex)
@@ -36,7 +36,7 @@ namespace InfinityScript
             }
         }
 
-        public static void Shutdown() => 
+        public static void Shutdown() =>
             ScriptProcessor.RunAll(script => script.OnExitLevel());
 
         public static void LoadScript(string scriptName) =>
@@ -48,27 +48,34 @@ namespace InfinityScript
             bool eatgame = false;
             bool eatscript = false;
             string messageTemp = message;
+
             ScriptProcessor.RunAll(script =>
             {
-                if (eatscript)
+
+                // Run Script.OnSay3 (by reference, with team and eat)
+                if (eatscript) 
                     return;
 
-                BaseScript.EventEat eventEat1 = script.OnSay3(entity, team == 0 ? BaseScript.ChatType.All : BaseScript.ChatType.Team, clientName, ref messageTemp);
-                eatgame = eatgame || eventEat1.HasFlag(BaseScript.EventEat.EatGame);
-                eatscript = eventEat1.HasFlag(BaseScript.EventEat.EatScript);
+                BaseScript.EventEat handled = script.OnSay3(entity, team == 0 ? BaseScript.ChatType.All : BaseScript.ChatType.Team, clientName, ref messageTemp);
 
-                if (eatscript)
+                eatgame = eatgame || handled.HasFlag(BaseScript.EventEat.EatGame);
+                eatscript = handled.HasFlag(BaseScript.EventEat.EatScript);
+
+                // Run Script.OnSay2 (normal, with eat)
+                if (eatscript) 
                     return;
 
-                BaseScript.EventEat eventEat2 = script.OnSay2(entity, clientName, messageTemp);
-                eatgame = eatgame || eventEat2.HasFlag(BaseScript.EventEat.EatGame);
-                eatscript = eventEat2.HasFlag(BaseScript.EventEat.EatScript);
+                handled = script.OnSay2(entity, clientName, messageTemp);
+                eatgame = eatgame || handled.HasFlag(BaseScript.EventEat.EatGame);
+                eatscript = handled.HasFlag(BaseScript.EventEat.EatScript);
 
-                if (eatscript)
+                // Run Script.OnSay (normal, without eat)
+                if (eatscript) 
                     return;
 
                 script.OnSay(entity, clientName, messageTemp);
             });
+
             message = messageTemp;
 
             return eatgame;
@@ -77,7 +84,9 @@ namespace InfinityScript
         public static void HandleCall(int entityRef, CallType funcID)
         {
             Entity entity = Entity.GetEntity(entityRef);
-            Parameter[] paras = CollectParameters(GameInterface.Notify_NumArgs());
+            int numArgs = GameInterface.Notify_NumArgs();
+            Parameter[] paras = CollectParameters(numArgs);
+
             switch (funcID)
             {
                 case CallType.LastStand:
@@ -139,28 +148,31 @@ namespace InfinityScript
             bool eat = false;
             ScriptProcessor.RunAll(script =>
             {
-                if (!script.ProcessServerCommand(commandName.ToLowerInvariant(), args))
-                    return;
+                bool success = script.ProcessServerCommand(commandName.ToLowerInvariant(), args);
 
-                eat = true;
+                if (success)
+                    eat = true;
             });
-
             return eat;
         }
 
         public static bool HandleClientCommand(string commandName, int entity)
         {
             string[] args = new string[GameInterface.Cmd_Argc_sv()];
-            for (int index = 0; index < args.Length; ++index)
-                args[index] = GameInterface.Cmd_Argv_sv(index);
+
+            for (int i = 0; i < args.Length; i++)
+                args[i] = GameInterface.Cmd_Argv_sv(i);
+
             Entity entObj = Entity.GetEntity(entity);
             bool handled = false;
+
             ScriptProcessor.RunAll(script =>
             {
-                if (!script.ProcessClientCommand(commandName.ToLowerInvariant(), entObj, args))
-                    return;
-                handled = true;
+                bool success = script.ProcessClientCommand(commandName.ToLowerInvariant(), entObj, args);
+                if (success)
+                    handled = true;
             });
+
             return handled;
         }
 
@@ -169,12 +181,12 @@ namespace InfinityScript
             bool eat = false;
             try
             {
-                string playerName = connectString.Split(new [] { "name" }, StringSplitOptions.None)[1];
-                string playerHWID = connectString.Split(new [] { "HWID" }, StringSplitOptions.None)[1];
-                string playerXUID = connectString.Split(new [] { "XUID" }, StringSplitOptions.None)[1];
-                string playerIP = connectString.Split(new [] { "IP-string" }, StringSplitOptions.None)[1];
-                string playerSID = connectString.Split(new [] { "steamid" }, StringSplitOptions.None)[1];
-                string playerXNA = connectString.Split(new [] { "xnaddr" }, StringSplitOptions.None)[1];
+                string playerName = connectString.Split(new[] { "name" }, StringSplitOptions.None)[1];
+                string playerHWID = connectString.Split(new[] { "HWID" }, StringSplitOptions.None)[1];
+                string playerXUID = connectString.Split(new[] { "XUID" }, StringSplitOptions.None)[1];
+                string playerIP = connectString.Split(new[] { "IP-string" }, StringSplitOptions.None)[1];
+                string playerSID = connectString.Split(new[] { "steamid" }, StringSplitOptions.None)[1];
+                string playerXNA = connectString.Split(new[] { "xnaddr" }, StringSplitOptions.None)[1];
 
                 ScriptProcessor.RunAll(script =>
                 {
