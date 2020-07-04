@@ -16,5 +16,5 @@ Enhanced version of InfinityScript
 soon
 
 ## Credits
-4D1 Developers - InfinityScript
-Slvr11 - Coroutines and GSCFunctions class
+* 4D1 Developers - InfinityScript
+* Slvr11 - Coroutines and GSCFunctions class
