@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+
+using static InfinityScript.Coroutine;
 
 namespace InfinityScript
 {
@@ -10,6 +11,7 @@ namespace InfinityScript
     {
         internal Dictionary<string, List<Func<string[], bool>>> _serverCommandHandlers = new Dictionary<string, List<Func<string[], bool>>>();
         internal Dictionary<string, List<Action<Entity, string[]>>> _clientCommandHandlers = new Dictionary<string, List<Action<Entity, string[]>>>();
+
 
         /// <summary>
         /// In game tick event
@@ -40,22 +42,30 @@ namespace InfinityScript
         {
             Players = new List<Entity>();
 
-            OnNotify("connecting", entity =>
-            {
-                if (!Players.Contains(entity.As<Entity>()))
-                    Players.Add(entity.As<Entity>());
+            StartThread(ConnectingEventHandler());
+            StartThread(ConnectedEventHandler());
+        }
 
-                if (PlayerConnecting == null)
-                    return;
+        private IEnumerator ConnectingEventHandler()
+        {
+            Entity player = null;
 
-                PlayerConnecting(entity.As<Entity>());
-            });
-            OnNotify("connected", entity =>
+            while (true)
             {
-                if (PlayerConnected == null)
-                    return;
-                PlayerConnected(entity.As<Entity>());
-            });
+                yield return WaitTill("connecting", new Action<Parameter[]>(param => player = param[0].As<Entity>()));
+                PlayerConnecting?.Invoke(player);
+            }
+        }
+
+        private IEnumerator ConnectedEventHandler()
+        {
+            Entity player = null;
+
+            while (true)
+            {
+                yield return WaitTill("connected", new Action<Parameter[]>(param => player = param[0].As<Entity>()));
+                PlayerConnected?.Invoke(player);
+            }
         }
 
         /// <summary>
@@ -177,286 +187,6 @@ namespace InfinityScript
         }
 
         /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter, Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter, Parameter, Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter, Parameter, Parameter, Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter, Parameter, Parameter, Parameter, Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter, Parameter, Parameter, Parameter, Parameter, Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Handling notify (can not unsubscribe)
-        /// </summary>
-        /// <param name="type">Notify</param>
-        /// <param name="handler">Function with parameters</param>
-        public void OnNotify(string type, Action<Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter, Parameter> handler) =>
-            OnNotifyInternal(type, handler);
-
-        /// <summary>
-        /// Start coroutine
-        /// </summary>
-        /// <param name="routine">Сoroutine method</param>
-        public static void StartAsync(IEnumerator routine)
-        {
-            Coroutine.Routines.Add(routine);
-            OnInterval(50, () => Coroutine.StepForward(routine));
-        }
-
-        /// <summary>
-        /// Start coroutine with early termination (handling a specific notify)
-        /// </summary>
-        /// <param name="routine">Сoroutine method</param>
-        /// <param name="endonNotifies">Endon notifies for early termination</param>
-        public static void StartAsync(IEnumerator routine, params string[] endonNotifies)
-        {
-            Coroutine.Routines.Add(routine);
-
-            void NotifyWaiter(int entRef, string message, Parameter[] parameters)
-            {
-                foreach (string notify in endonNotifies)
-                {
-                    if (message == notify && Coroutine.Routines.Contains(routine))
-                    {
-                        Coroutine.Routines.Remove(routine);
-                        Notified -= NotifyWaiter;
-                    }
-                }
-            }
-
-            Notified += NotifyWaiter;
-
-            OnInterval(50, () => Coroutine.StepForward(routine));
-        }
-
-        /// <summary>
-        /// Makes a delay in seconds
-        /// </summary>
-        /// <param name="time">Time delay in seconds (1.5f = 1.5 seconds or 1500 milliseconds)</param>
-        /// <returns></returns>
-        public static IEnumerator Wait(float time)
-        {
-            Stopwatch watch = Stopwatch.StartNew();
-
-            while (watch.Elapsed.TotalSeconds < time)
-                yield return 0;
-        }
-
-        /// <summary>
-        /// Just a delay...
-        /// </summary>
-        /// <returns></returns>
-        public static IEnumerator WaitForFrame()
-        {
-            Stopwatch watch = Stopwatch.StartNew();
-
-            while (watch.Elapsed.TotalSeconds < 0.0500000007450581)
-                yield return 0;
-        }
-
-        /// <summary>
-        /// Wait notify
-        /// </summary>
-        /// <param name="notify"></param>
-        /// <returns></returns>
-        public static IEnumerator WaitTill(string notify)
-        {
-            bool isWait = true;
-
-            void NotifyWaiter(int entRef, string message, Parameter[] parameters)
-            {
-                if (message == notify) 
-                    isWait = false;
-            }
-
-            Notified += NotifyWaiter;
-
-            while (isWait)
-                yield return 0;
-
-            Notified -= NotifyWaiter;
-        }
-
-        /// <summary>
-        /// Wait notify from "notifies"
-        /// </summary>
-        /// <param name="notifies">Notifies list to wait</param>
-        /// <returns></returns>
-        public static IEnumerator WaitTill(Action<string> resultAction, params string[] notifies)
-        {
-            bool isWait = true;
-
-            void NotifyWaiter(int entRef, string message, Parameter[] parameters)
-            {
-                foreach (string notify in notifies)
-                {
-                    if (!isWait)
-                        return;
-
-                    if (message == notify)
-                    {
-                        resultAction?.Invoke(notify);
-                        isWait = false;
-                    }
-                }
-            }
-
-            Notified += NotifyWaiter;
-
-            while (isWait)
-                yield return 0;
-
-            Notified -= NotifyWaiter;
-        }
-
-        /// <summary>
-        /// Wait notify or timeout
-        /// </summary>
-        /// <param name="notify">Notify to wait</param>
-        /// <param name="time">Milliseconds timeout</param>
-        /// <param name="returnReasonAction">Return result work WaitTill: notify or timeout</param>
-        /// <returns></returns>
-        public static IEnumerator WaitTill(string notify, int time, Action<string> resultAction = null)
-        {
-            bool isWait = true;
-
-            void NotifyWaiter(int entRef, string message, Parameter[] parameters)
-            {
-                if (message == notify)
-                    isWait = false;
-            }
-
-            Stopwatch watch = Stopwatch.StartNew();
-            TimeSpan elapsed;
-
-            Notified += NotifyWaiter;
-
-            while (isWait)
-            {
-                elapsed = watch.Elapsed;
-                if (elapsed.TotalSeconds < time)
-                    yield return 0;
-                else
-                    break;
-            }
-
-            if (watch.IsRunning)
-                watch.Stop();
-
-            Notified -= NotifyWaiter;
-            elapsed = watch.Elapsed;
-            if (elapsed.TotalSeconds >= time)
-            {
-                resultAction?.Invoke("timeout");
-                yield return "timeout";
-            }
-            else
-            {
-                resultAction?.Invoke(notify);
-                yield return notify;
-            }
-        }
-
-        /// <summary>
-        /// Wait notify with return parameters
-        /// </summary>
-        /// <param name="notify">Notify to wait</param>
-        /// <param name="resultAction">Returns parameters</param>
-        /// <returns></returns>
-        public static IEnumerator WaitTill(string notify, Action<Parameter[]> resultAction = null)
-        {
-            bool isWait = true;
-
-            void NotifyWaiter(int entRef, string message, Parameter[] parameters)
-            {
-                if (message == notify)
-                {
-                    isWait = false;
-                    resultAction?.Invoke(parameters);
-                }
-            }
-
-            Notified += NotifyWaiter;
-
-            while (isWait)
-                yield return 0;
-
-            Notified -= NotifyWaiter;
-        }
-
-
-        /// <summary>
         /// Method calls a function or evaluates an expression at specified intervals (in milliseconds)
         /// </summary>
         /// <param name="interval">Interval in milliseconds (1000ms = 1s)</param>
@@ -511,8 +241,10 @@ namespace InfinityScript
                     Log.Write(LogLevel.Error, "Exception during Tick on script {0}: {1}", GetType().Name, ex.ToString());
                 }
             }
+
             ProcessTimers();
             ProcessNotifications();
+            StepForward();
         }
 
         internal bool ProcessServerCommand(string command, string[] args)

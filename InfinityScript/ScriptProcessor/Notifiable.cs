@@ -6,19 +6,8 @@ namespace InfinityScript
 {
     public abstract class Notifiable
     {
-        #region OnNotify funcs
-        protected void OnNotifyInternal(string type, Delegate handler)
-        {
-            if (!_notifyHandlers.ContainsKey(type))
-                _notifyHandlers[type] = new List<Delegate>();
-
-            _notifyHandlers[type].Add(handler);
-        }
-        #endregion
-
         private Dictionary<string, List<Delegate>> _notifyHandlers = new Dictionary<string, List<Delegate>>();
         private List<NotifyData> _pendingNotifys = new List<NotifyData>();
-
         private struct NotifyData
         {
             public int entity;
@@ -30,16 +19,19 @@ namespace InfinityScript
 
         internal void ProcessNotifications()
         {
-            var notifies = _pendingNotifys.ToArray();
+            // handle notify events
+            var notifys = _pendingNotifys.ToArray();
             _pendingNotifys.Clear();
 
-            foreach (var notify in notifies)
+            foreach (var notify in notifys)
             {
                 Notified?.Invoke(notify.entity, notify.type, notify.parameters);
 
                 if (_notifyHandlers.ContainsKey(notify.type))
                 {
-                    foreach (var handler in _notifyHandlers[notify.type])
+                    var handlers = _notifyHandlers[notify.type];
+
+                    foreach (var handler in handlers)
                     {
                         try
                         {
@@ -54,11 +46,13 @@ namespace InfinityScript
                                 handler.DynamicInvoke(newParameters);
                             }
                             else
+                            {
                                 handler.DynamicInvoke(notify.parameters);
+                            }
                         }
                         catch (Exception ex)
                         {
-                            Log.Write(LogLevel.Error, "Exception during handling of notify event {0} on {1}: {2}", notify.type, this, ex.InnerException != null ? ex.InnerException.Message : ex.Message);
+                            Log.Write(LogLevel.Error, "Exception during handling of notify event {0} on {1}: {2}", notify.type, this, (ex.InnerException != null) ? ex.InnerException.ToString() : ex.ToString());
                         }
                     }
                 }
@@ -131,6 +125,7 @@ namespace InfinityScript
             public int triggerTime;
             public int interval;
         }
-        #endregion;
+        #endregion
+
     }
 }

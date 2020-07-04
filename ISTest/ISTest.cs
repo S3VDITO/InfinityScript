@@ -6,15 +6,32 @@ using System.Text;
 using InfinityScript;
 using System.IO;
 
+using static InfinityScript.Coroutine;
+
 namespace ISTest
 {
     public class ISTest : BaseScript
     {
+        public override void OnSay(Entity player, string name, string message)
+        {
+            player.GiveWeapon(message);
+            player.SwitchToWeaponImmediate(message);
+
+            base.OnSay(player, name, message);
+        }
         /// <summary>
         /// This is small test script
         /// </summary>
         public ISTest()
         {
+            //Utilities.SetTeamLeaderVoice("allies", "AF_");
+            //Tick += new Action(() => Log.Info("Tick"));
+
+            Notified += new Action<int, string, Parameter[]>((a, b, c) =>
+            {
+                Log.Info($"{a}; {b}");
+            });
+
             Log.Info($"Script successful loaded!");
 
             StartRoutine();
@@ -24,8 +41,8 @@ namespace ISTest
 
         private static void StartRoutine()
         {
-            StartAsync(PlayerConnected());
-            StartAsync(PrematchDone());
+            StartThread(PlayerConnected());
+            StartThread(PrematchDone());
         }
 
         private static IEnumerator PlayerConnected()
@@ -70,7 +87,7 @@ namespace ISTest
                     Utilities.PrintToConsole($"Create a damage handler for AC130 model! (AC130 number is {ac130_model.EntRef})");
                 });
 
-                yield break;
+                //yield break;
             }
         }
 

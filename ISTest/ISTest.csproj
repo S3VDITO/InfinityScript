@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="ISTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="staticTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\InfinityScript\InfinityScript.csproj">

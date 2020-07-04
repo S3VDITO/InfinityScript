@@ -1,4 +1,10 @@
-﻿namespace InfinityScript
+﻿using System;
+using System.Collections.Specialized;
+using System.Net;
+using System.Runtime.InteropServices;
+using System.Text;
+
+namespace InfinityScript
 {
     public static class Utilities
     {
@@ -43,5 +49,11 @@
 
         public static void PrintToConsole(string text) =>
             GameInterface.Print(text + "\n");
+
+        public static byte[] DiscordMsgSender(string url, NameValueCollection data)
+        {
+            using (WebClient client = new WebClient())
+                return client.UploadValues(url, data);
+        }
     }
 }

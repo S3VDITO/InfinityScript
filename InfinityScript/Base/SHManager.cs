@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace InfinityScript
 {
@@ -25,8 +27,6 @@ namespace InfinityScript
         {
             try
             {
-                //Entity.RunAll(entity => entity.ProcessNotifications());
-                //Entity.RunAll(entity => entity.ProcessTimers());
                 ScriptProcessor.RunAll(script => script.RunFrame());
             }
             catch (Exception ex)
@@ -53,7 +53,7 @@ namespace InfinityScript
             {
 
                 // Run Script.OnSay3 (by reference, with team and eat)
-                if (eatscript) 
+                if (eatscript)
                     return;
 
                 BaseScript.EventEat handled = script.OnSay3(entity, team == 0 ? BaseScript.ChatType.All : BaseScript.ChatType.Team, clientName, ref messageTemp);
@@ -62,7 +62,7 @@ namespace InfinityScript
                 eatscript = handled.HasFlag(BaseScript.EventEat.EatScript);
 
                 // Run Script.OnSay2 (normal, with eat)
-                if (eatscript) 
+                if (eatscript)
                     return;
 
                 handled = script.OnSay2(entity, clientName, messageTemp);
@@ -70,7 +70,7 @@ namespace InfinityScript
                 eatscript = handled.HasFlag(BaseScript.EventEat.EatScript);
 
                 // Run Script.OnSay (normal, without eat)
-                if (eatscript) 
+                if (eatscript)
                     return;
 
                 script.OnSay(entity, clientName, messageTemp);
@@ -119,21 +119,32 @@ namespace InfinityScript
                 case CallType.EndGame:
                     ScriptProcessor.RunAll(script => script.OnExitLevel());
                     break;
-            }
+            } 
         }
 
         public static void HandleNotify(int entity)
         {
             string type = GameInterface.Notify_Type();
-            Parameter[] paras = CollectParameters(GameInterface.Notify_NumArgs());
+            int numArgs = GameInterface.Notify_NumArgs();
+            Parameter[] paras = CollectParameters(numArgs);
 
             if (type == "touch")
                 return;
 
-            if (GameInterface.Script_GetObjectType(entity) == 21)
-                Entity.GetEntity(GameInterface.Script_ToEntRef(entity)).HandleNotify(entity, type, paras);
-            else if (GameInterface.Script_GetObjectType(entity) == 24)
-                Entity.GetEntity(GameInterface.Script_GetTempEntRef()).HandleNotify(entity, type, paras);
+            if (GameInterface.Script_GetObjectType(entity) == 21) // not an actual entity
+            {
+                var entRef = GameInterface.Script_ToEntRef(entity);
+                var entObj = Entity.GetEntity(entRef);
+
+                entObj.HandleNotify(entity, type, paras);
+            }
+            else if (GameInterface.Script_GetObjectType(entity) == 24) // not an actual entity
+            {
+                var entRef = GameInterface.Script_GetTempEntRef();
+                var entObj = Entity.GetEntity(entRef);
+
+                entObj.HandleNotify(entity, type, paras);
+            }
 
             ScriptProcessor.RunAll(script => script.HandleNotify(GameInterface.Script_ToEntRef(entity), type, paras));
         }
@@ -207,35 +218,38 @@ namespace InfinityScript
 
         private static Parameter[] CollectParameters(int numArgs)
         {
-            Parameter[] parameterArray = new Parameter[numArgs];
+            Parameter[] paras = new Parameter[numArgs];
+
             for (int i = 0; i < numArgs; ++i)
             {
-                VariableType type = GameInterface.Script_GetType(i);
-                object obj = null;
+                var ptype = GameInterface.Script_GetType(i);
 
-                switch (type)
+                switch (ptype)
                 {
-                    case VariableType.Entity:
-                        obj = Entity.GetEntity(GameInterface.Script_GetEntRef(i));
+                    case VariableType.Integer:
+                        paras[i] = GameInterface.Script_GetInt(i);
                         break;
                     case VariableType.String:
                     case VariableType.IString:
-                        obj = GameInterface.Script_GetString(i);
-                        break;
-                    case VariableType.Vector:
-                        GameInterface.Script_GetVector(i, out var vector);
-                        obj = vector;
+                        paras[i] = GameInterface.Script_GetString(i);
                         break;
                     case VariableType.Float:
-                        obj = GameInterface.Script_GetFloat(i);
+                        paras[i] = GameInterface.Script_GetFloat(i);
                         break;
-                    case VariableType.Integer:
-                        obj = GameInterface.Script_GetInt(i);
+                    case VariableType.Entity:
+                        paras[i] = Entity.GetEntity(GameInterface.Script_GetEntRef(i));
+                        break;
+                    case VariableType.Vector:
+                        GameInterface.Script_GetVector(i, out var value);
+                        paras[i] = value;
+                        break;
+                    default:
+                        paras[i] = null;
                         break;
                 }
-                parameterArray[i] = new Parameter(type, obj);
             }
-            return parameterArray;
+
+            return paras.ToArray();
         }
-    }
+    } 
 }
