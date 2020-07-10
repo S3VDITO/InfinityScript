@@ -3,129 +3,260 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Text;
-using InfinityScript;
 using System.IO;
 
-using static InfinityScript.Coroutine;
+using InfinityScript;
+using static InfinityScript.GSCFunctions;
+
+using ISLogger = InfinityScript.Log;
+using static InfinityScript.ThreadScript;
 
 namespace ISTest
 {
     public class ISTest : BaseScript
     {
-        public override void OnSay(Entity player, string name, string message)
-        {
-            player.GiveWeapon(message);
-            player.SwitchToWeaponImmediate(message);
-
-            base.OnSay(player, name, message);
-        }
-        /// <summary>
-        /// This is small test script
-        /// </summary>
         public ISTest()
         {
-            //Utilities.SetTeamLeaderVoice("allies", "AF_");
-            //Tick += new Action(() => Log.Info("Tick"));
+            Utilities.JumpHeight = 500;
+            PlayerConnected += OnPlayerConnected;
 
-            Notified += new Action<int, string, Parameter[]>((a, b, c) =>
+            //Notified += ISTest_Notified;
+        }
+
+        private void ISTest_Notified(int arg1, string arg2, Parameter[] arg3)
+        {
+            ISLogger.Info($"{arg1} {arg2}");
+        }
+
+        private void OnPlayerConnected(Entity player)
+        {
+            ISLogger.Info($"{player.Name} connected!");
+
+            Thread(OnPlayerSpawned(player), (entRef, notify, paras) =>
             {
-                Log.Info($"{a}; {b}");
+                if (notify == "disconnect" && player.EntRef == entRef)
+                    return false;
+
+                return true;
+            });
+        }
+
+        private static IEnumerator OnPlayerSpawned(Entity player)
+        {
+            while (true)
+            {
+                yield return player.WaitTill("spawned_player");
+            }
+        }
+
+
+        public override void OnSay(Entity player, string name, string message)
+        {
+            if (message == "predator")
+            {
+                Thread(Predator(player), (entRef, notify, paras) =>
+                {
+                    if (player.EntRef == entRef &&
+                    (notify == "disconnect" || notify == "fired"))
+                        return false;
+
+                    return true;
+                });
+            }
+
+            if (message == "dump_hud")
+                HUD_Dump();
+
+            if (message == "dump_ent")
+                Entity_Dump();
+
+            if (message == "init_uav")
+                CreateUAV();
+        }
+
+        public static void HUD_Dump()
+        {
+            using (StreamWriter sw = new StreamWriter("scripts/hud_dump.txt"))
+            {
+                for (int entRef = 65536; entRef < 66550; entRef++)
+                {
+                    HudElem ent = HudElem.GetHudElem(entRef);
+                    sw.WriteLine($"HUD ID: {entRef}");
+                    sw.WriteLine($"Font: {ent.Font}");
+                    sw.WriteLine($"FontScale: {ent.FontScale}");
+                    sw.WriteLine($"Alpha: {ent.Alpha}");
+                    sw.WriteLine($"Label: {ent.Label}");
+                    sw.WriteLine($"Sort: {ent.Sort}");
+                    sw.WriteLine($"X: {ent.X}");
+                    sw.WriteLine($"X: {ent.Y}");
+                    sw.WriteLine($"Archived: {ent.Archived}");
+                    sw.WriteLine("---------------------------------------------------------------");
+                }
+            }
+        }
+
+        public static void Entity_Dump()
+        {
+            using (StreamWriter sw = new StreamWriter("scripts/entity_dump.txt"))
+            {
+                for (int entRef = 0; entRef < 2048; entRef++)
+                {
+                    Entity ent = Entity.GetEntity(entRef);
+                    sw.WriteLine($"Entity ID: {entRef}");
+                    sw.WriteLine($"TargetName: {ent.TargetName}");
+                    sw.WriteLine($"ClassName: {ent.Classname}");
+                    sw.WriteLine($"Target: {ent.Target}");
+                    sw.WriteLine($"SpawnFlags: {ent.SpawnFlags}");
+                    sw.WriteLine($"dmg: {ent.dmg}");
+                    sw.WriteLine($"Code_ClassName: {ent.Code_Classname}");
+                    sw.WriteLine($"Model: {ent.Model}");
+                    sw.WriteLine("---------------------------------------------------------------");
+                }
+            }
+        }
+
+
+        #region predator test
+        private static Entity uav_rig = null;
+        private static Entity uav_model = null;
+
+        public static void CreateUAV()
+        {
+            uav_rig = GetEnt("uavrig_script_model", "targetname");
+
+            uav_model = Spawn("script_model", uav_rig.Origin);
+            uav_model.SetModel("vehicle_predator_b");
+
+            float zOffset = 6300;
+            float angle = 0;
+            float radiusOffset = 6100;
+            float xOffset = (float)Math.Cos(angle) * radiusOffset;
+            float yOffset = (float)Math.Sin(angle) * radiusOffset;
+
+            Vector3 angleVector = VectorNormalize(new Vector3(xOffset, yOffset, zOffset));
+            angleVector *= 6100;
+
+            uav_model.LinkTo(uav_rig, "tag_origin", angleVector, new Vector3(0, (float)angle - 90, 10));
+        }
+
+        public static IEnumerator Predator(Entity player)
+        {
+            ShotFiredDarkScreenOverlay(player);
+
+            Thread(ThermalVisionSwitcher(player), (entRef, notify, paras) => 
+            {
+                if (player.EntRef == entRef && 
+                (notify == "disconnect"))
+                    return false;
+
+                return true;
             });
 
-            Log.Info($"Script successful loaded!");
+            player.PlayerLinkWeaponViewToDelta(uav_model, "tag_player", 1.0f, 40, 40, 25, 40);
 
-            StartRoutine();
+            AfterDelay(250, () =>
+            {
+                player.SetPlayerAngles(VectorToAngles(uav_rig.Origin - player.GetEye()));
+                player.DisableWeapons();
+                player.DisableWeaponSwitch();
+                player.DisableOffhandWeapons();
+
+                player.ThermalVisionFOFOverlayOn();
+                player.ThermalVisionOn();
+            });
+
+            while (!player.AttackButtonPressed())
+                yield return 0;
+
+            player.ThermalVisionOn();
+
+            player.Notify("fired");
+
+            Vector3 offset = player.GetEye() + (AnglesToForward(player.GetPlayerAngles()) * 100) + (AnglesToRight(player.GetPlayerAngles()) * -100);
+            Entity missile = MagicBullet("remotemissile_projectile_mp", offset, player.GetEye() + AnglesToForward(player.GetPlayerAngles()) * 15000, player);
+
+            player.Unlink();
+            player.VisionSetMissileCamForPlayer("black_bw", 0);
+
+            player.CameraLinkTo(missile, "tag_origin");
+            player.ControlsLinkTo(missile);
+
+            yield return missile.WaitTill("death");
+
+            player.ControlsUnlink();
+            StaticEffect(player, 500);
+
+            yield return Wait(.5f);
+
+            player.ThermalVisionFOFOverlayOff();
+            player.ThermalVisionOff();
+
+            player.CameraUnlink();
+
+            player.EnableOffhandWeapons();
+            player.EnableWeaponSwitch();
+            player.EnableWeapons();
+
+            yield break;
         }
 
-        #region Coroutines test
-
-        private static void StartRoutine()
+        private static IEnumerator ThermalVisionSwitcher(Entity player)
         {
-            StartThread(PlayerConnected());
-            StartThread(PrematchDone());
-        }
-
-        private static IEnumerator PlayerConnected()
-        {
-            Parameter player = null;
             while (true)
             {
-                yield return WaitTill("connected", args => player = args[0]);
-                HUD_DamageFeedBack(player.As<Entity>());
-                Utilities.PrintToConsole($"{player.As<Entity>().Name} connected!");
+                yield return player.WaitTill("thermal_switch");
+                player.ThermalVisionOn();
+                yield return player.WaitTill("thermal_switch");
+                player.ThermalVisionOff();
             }
         }
 
-        private static IEnumerator PrematchDone()
+        private static void StaticEffect(Entity player, int duration)
         {
-            while (true)
+            if (!player.IsPlayer)
+                return;
+
+            HudElem staticBG = NewClientHudElem(player);
+            staticBG.HorzAlign = HudElem.HorzAlignments.Fullscreen;
+            staticBG.VertAlign = HudElem.VertAlignments.Fullscreen;
+            staticBG.SetShader("white", 640, 480);
+            staticBG.Archived = true;
+            staticBG.Sort = 10;
+
+            HudElem staticFG = NewClientHudElem(player);
+            staticFG.HorzAlign = HudElem.HorzAlignments.Fullscreen;
+            staticFG.VertAlign = HudElem.VertAlignments.Fullscreen;
+            staticFG.SetShader("ac130_overlay_grain", 640, 480);
+            staticFG.Archived = true;
+            staticFG.Sort = 20;
+
+            AfterDelay(duration, () =>
             {
-                yield return WaitTill("prematch_done");
-                Utilities.PrintToConsole("prematch_done event is complied!");
-
-                Utilities.PrintToConsole("Finding AC130 model!");
-                Entity ac130_model = GSCFunctions.GetEnt("vehicle_ac130_coop", "targetname");
-
-                if (Utilities.IsEntDefined(ac130_model))
-                {
-                    Utilities.PrintToConsole("AC130 model funded!");
-
-                    ac130_model.Show();
-                    ac130_model.SetCanDamage(true);
-
-                    ac130_model.MaxHealth = 300;
-                    ac130_model.Health = 300;
-                }
-                else
-                {
-                    Utilities.PrintToConsole("AC130 model unfunded!");
-                    yield break;
-                }
-
-                AfterDelay(1000, () =>
-                {
-                    Utilities.PrintToConsole($"Create a damage handler for AC130 model! (AC130 number is {ac130_model.EntRef})");
-                });
-
-                //yield break;
-            }
+                staticFG.Destroy();
+                staticBG.Destroy();
+            });
         }
 
-        private static IEnumerator AC130_damagehandler(Entity ac130)
+        private static void ShotFiredDarkScreenOverlay(Entity player)
         {
-            Parameter[] parameters = null;
-            while (true)
+            HudElem darkScreenOverlay = NewClientHudElem(player);
+            darkScreenOverlay.X = 0;
+            darkScreenOverlay.Y = 0;
+            darkScreenOverlay.AlignX = HudElem.XAlignments.Left;
+            darkScreenOverlay.AlignY = HudElem.YAlignments.Top;
+            darkScreenOverlay.HorzAlign = HudElem.HorzAlignments.Fullscreen;
+            darkScreenOverlay.VertAlign = HudElem.VertAlignments.Fullscreen;
+            darkScreenOverlay.SetShader("black", 640, 480);
+            darkScreenOverlay.Sort = -10;
+            darkScreenOverlay.Alpha = 1;
+
+            AfterDelay(1000, () =>
             {
-                yield return WaitTill("damage", args => parameters = args);
-                //Utilities.PrintToConsole(string.Join("\n", parameters.Select(x => x.ToString()).ToArray()));
-                UpdateDamageFeedBack(parameters[1].As<Entity>());
-            }
-        }
+                darkScreenOverlay.FadeOverTime(1);
+                darkScreenOverlay.Alpha = 0;
+                AfterDelay(500, () => darkScreenOverlay.Destroy());
+            });
 
-        #endregion
-
-        #region Damage feedback
-
-        private static void HUD_DamageFeedBack(Entity player)
-        {
-            player.SetField("hud_damagefeedback", GSCFunctions.NewClientHudElem(player));
-            player.GetField<HudElem>("hud_damagefeedback").HorzAlign = HudElem.HorzAlignments.Center;
-            player.GetField<HudElem>("hud_damagefeedback").VertAlign = HudElem.VertAlignments.Middle;
-            player.GetField<HudElem>("hud_damagefeedback").X = -12;
-            player.GetField<HudElem>("hud_damagefeedback").Y = -12;
-            player.GetField<HudElem>("hud_damagefeedback").Alpha = 0;
-            player.GetField<HudElem>("hud_damagefeedback").SetShader("damage_feedback", 24, 48);
-        }
-
-        private static void UpdateDamageFeedBack(Entity player, string typeHit = "damage_feedback")
-        {
-            player.GetField<HudElem>("hud_damagefeedback").SetShader(typeHit, 24, 48);
-
-            player.PlayLocalSound("MP_hit_alert");
-
-            player.GetField<HudElem>("hud_damagefeedback").Alpha = 1;
-            player.GetField<HudElem>("hud_damagefeedback").FadeOverTime(1);
-            player.GetField<HudElem>("hud_damagefeedback").Alpha = 0;
         }
         #endregion
     }

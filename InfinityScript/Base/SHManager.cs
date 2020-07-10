@@ -84,8 +84,7 @@ namespace InfinityScript
         public static void HandleCall(int entityRef, CallType funcID)
         {
             Entity entity = Entity.GetEntity(entityRef);
-            int numArgs = GameInterface.Notify_NumArgs();
-            Parameter[] paras = CollectParameters(numArgs);
+            Parameter[] paras = CollectParameters(GameInterface.Notify_NumArgs());
 
             switch (funcID)
             {
@@ -157,12 +156,10 @@ namespace InfinityScript
                 args[i] = GameInterface.Cmd_Argv(i);
 
             bool eat = false;
+
             ScriptProcessor.RunAll(script =>
             {
-                bool success = script.ProcessServerCommand(commandName.ToLowerInvariant(), args);
-
-                if (success)
-                    eat = true;
+                eat = script.OnServerCommand(commandName.ToLowerInvariant(), args);
             });
             return eat;
         }
@@ -179,9 +176,7 @@ namespace InfinityScript
 
             ScriptProcessor.RunAll(script =>
             {
-                bool success = script.ProcessClientCommand(commandName.ToLowerInvariant(), entObj, args);
-                if (success)
-                    handled = true;
+                handled = script.OnClientCommand(entObj, commandName.ToLowerInvariant(), args);
             });
 
             return handled;
@@ -202,9 +197,12 @@ namespace InfinityScript
                 ScriptProcessor.RunAll(script =>
                 {
                     string error = script.OnPlayerRequestConnection(playerName, playerHWID, playerXUID, playerIP, playerSID, playerXNA);
+
                     if (string.IsNullOrEmpty(error))
                         return;
+
                     eat = true;
+
                     GameInterface.SetConnectErrorMsg(error);
                 });
                 return eat;
@@ -218,38 +216,40 @@ namespace InfinityScript
 
         private static Parameter[] CollectParameters(int numArgs)
         {
-            Parameter[] paras = new Parameter[numArgs];
+            var paras = new Parameter[numArgs];
 
-            for (int i = 0; i < numArgs; ++i)
+            for (int i = 0; i < numArgs; i++)
             {
                 var ptype = GameInterface.Script_GetType(i);
+                object value = null;
 
                 switch (ptype)
                 {
                     case VariableType.Integer:
-                        paras[i] = GameInterface.Script_GetInt(i);
+                        value = GameInterface.Script_GetInt(i);
                         break;
                     case VariableType.String:
                     case VariableType.IString:
-                        paras[i] = GameInterface.Script_GetString(i);
+                        value = GameInterface.Script_GetString(i);
                         break;
                     case VariableType.Float:
-                        paras[i] = GameInterface.Script_GetFloat(i);
+                        value = GameInterface.Script_GetFloat(i);
                         break;
                     case VariableType.Entity:
-                        paras[i] = Entity.GetEntity(GameInterface.Script_GetEntRef(i));
+                        value = Entity.GetEntity(GameInterface.Script_GetEntRef(i));
                         break;
                     case VariableType.Vector:
-                        GameInterface.Script_GetVector(i, out var value);
-                        paras[i] = value;
+                        GameInterface.Script_GetVector(i, out var v);
+                        value = v;
                         break;
                     default:
-                        paras[i] = null;
                         break;
                 }
+
+                paras[i] = new Parameter(ptype, value);
             }
 
-            return paras.ToArray();
+            return paras;
         }
     } 
 }

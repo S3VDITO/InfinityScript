@@ -3,21 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-using static InfinityScript.Coroutine;
+using static InfinityScript.ThreadScript;
 
 namespace InfinityScript
 {
     public abstract class BaseScript : Notifiable
     {
-        internal Dictionary<string, List<Func<string[], bool>>> _serverCommandHandlers = new Dictionary<string, List<Func<string[], bool>>>();
-        internal Dictionary<string, List<Action<Entity, string[]>>> _clientCommandHandlers = new Dictionary<string, List<Action<Entity, string[]>>>();
-
-
-        /// <summary>
-        /// In game tick event
-        /// </summary>
-        protected event Action Tick;
-
         /// <summary>
         /// Player connecting event
         /// </summary>
@@ -42,8 +33,8 @@ namespace InfinityScript
         {
             Players = new List<Entity>();
 
-            StartThread(ConnectingEventHandler());
-            StartThread(ConnectedEventHandler());
+            Thread(ConnectingEventHandler());
+            Thread(ConnectedEventHandler());
         }
 
         private IEnumerator ConnectingEventHandler()
@@ -60,7 +51,6 @@ namespace InfinityScript
         private IEnumerator ConnectedEventHandler()
         {
             Entity player = null;
-
             while (true)
             {
                 yield return WaitTill("connected", new Action<Parameter[]>(param => player = param[0].As<Entity>()));
@@ -140,12 +130,26 @@ namespace InfinityScript
 
         }
 
+        public virtual void OnServerFrame()
+        {
+            
+        }
+
         public virtual void OnVehicleDamage(Entity player, Entity inflictor, Entity attacker, int damage, int dFlags, string mod, string weapon, Vector3 point, Vector3 dir, string hitLoc, int timeOffset, int modelIndex, string partName)
         {
         }
 
         public virtual void OnPlayerLastStand(Entity player,Entity inflictor, Entity attacker, int damage, string mod, string weapon, Vector3 dir, string hitLoc, int timeOffset, int deathAnimDuration)
         {
+        }
+
+        public virtual bool OnServerCommand(string command, string[] args)
+        {
+            return false;
+        }
+        public virtual bool OnClientCommand(Entity entSender, string command, string[] args)
+        {
+            return false;
         }
 
         /// <summary>
@@ -230,83 +234,10 @@ namespace InfinityScript
 
         internal void RunFrame()
         {
-            if (Tick != null)
-            {
-                try
-                {
-                    Tick();
-                }
-                catch (Exception ex)
-                {
-                    Log.Write(LogLevel.Error, "Exception during Tick on script {0}: {1}", GetType().Name, ex.ToString());
-                }
-            }
-
+            OnServerFrame();
             ProcessTimers();
             ProcessNotifications();
-            StepForward();
         }
-
-        internal bool ProcessServerCommand(string command, string[] args)
-        {
-            bool flag = false;
-            if (_serverCommandHandlers.ContainsKey(command))
-            {
-                foreach (var _ in _serverCommandHandlers[command].Where(func => func(args)).Select(func => new { }))
-                {
-                    flag = true;
-                }
-            }
-            return flag;
-        }
-
-        internal bool ProcessClientCommand(string command, Entity entity, string[] args)
-        {
-            bool flag = false;
-            if (_clientCommandHandlers.ContainsKey(command))
-            {
-                foreach (Action<Entity, string[]> action in _clientCommandHandlers[command])
-                {
-                    action(entity, args);
-                    flag = true;
-                }
-            }
-            return flag;
-        }
-
-        public void OnServerCommand(string command, Func<string[], bool> func)
-        {
-            if (!_serverCommandHandlers.ContainsKey(command))
-                _serverCommandHandlers[command] = new List<Func<string[], bool>>();
-            _serverCommandHandlers[command].Add(func);
-        }
-
-        public void OnServerCommand(string command, Action<string[]> func) =>
-            OnServerCommand(command, args =>
-            {
-                func(args);
-                return true;
-            });
-
-        public void OnServerCommand(string command, Action func) =>
-            OnServerCommand(command, args =>
-            {
-                func();
-                return true;
-            });
-
-        public void OnClientCommand(string command, Action<Entity, string[]> func)
-        {
-            if (!_clientCommandHandlers.ContainsKey(command))
-                _clientCommandHandlers[command] = new List<Action<Entity, string[]>>();
-            _clientCommandHandlers[command].Add(func);
-        }
-
-        public void OnClientCommand(string command, Action<Entity> func) => 
-            OnClientCommand(command, (entity, args) => func(entity));
-
-        public void OnClientCommand(string command, Action func) =>
-            OnClientCommand(command, (entity, args) => func());
 
         /// <summary>
         /// Print messgae for all players

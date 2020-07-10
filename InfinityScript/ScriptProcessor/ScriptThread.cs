@@ -2,64 +2,56 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
+using System.Linq;
+using System.Reflection;
 
 namespace InfinityScript
 {
-    public static class Coroutine
+    public class ScriptThread : Notifiable
     {
-        internal static List<IEnumerator> Routines = new List<IEnumerator>();
+        private IEnumerator Routine { get; }
+        private bool isActive { get; set; } = true;
 
-        internal static void StepForward()
+        private void Notified(int entRef, string notify, Parameter[])
+
+        public ScriptThread(IEnumerator routine)
         {
-            foreach (var routine in Routines)
+            Routine = routine;
+            BaseScript.OnInterval(50, () => StepForward());
+        }
+        private bool StepForward()
+        {
+            try
             {
-                try
-                {
-                    if (!Running)
-                        return;
+                if (isActive)
+                    return true;
 
-                    if (!Routines.Contains(routine))
-                        return;
+                if ((!(Routine.Current is IEnumerator enumerator) || !MoveNext(enumerator)) && !Routine.MoveNext())
+                    return false;
 
-                    Update(routine);
-                }
-                catch (Exception ex)
-                {
-
-                }
+                return false;
             }
+            catch
+            {
+                
+            }
+
+            return false;
         }
-
-        internal static void StopAll() =>
-            Routines.Clear();
-
-        internal static void Update(IEnumerator routine)
-        {
-            if ((!(routine.Current is IEnumerator enumerator) || !MoveNext(enumerator)) && !routine.MoveNext())
-                Routines.Remove(routine);
-        }
-
-        internal static bool MoveNext(IEnumerator routine) =>
+        private bool MoveNext(IEnumerator routine) =>
             routine.Current is IEnumerator enumerator && MoveNext(enumerator) || routine.MoveNext();
 
-        internal static int Count =>
-            Routines.Count;
-
-        internal static bool Running =>
-            Routines.Count > 0;
-
-        private static void RemoveRoutine(this IEnumerator routine) =>
-            Routines.Remove(routine);
-
-        public static void StartThread(IEnumerator routine)
-        {
-            Routines.Add(routine);
-        }
-
-        public static void SetEndon(this IEnumerator routine, Entity entity, params string[] endonNotifys)
+        public void SetEndon(Entity entity, params string[] endonNotifys)
         {
             void NotifyWaiter(int entRef, string message, Parameter[] parameters)
             {
+                if (!isActive)
+                {
+                    Notifiable.Notified -= NotifyWaiter;
+                    return;
+                }
+
                 if (entity.EntRef != entRef)
                     return;
 
@@ -67,24 +59,30 @@ namespace InfinityScript
                 {
                     if (notify == message)
                     {
-                        routine.RemoveRoutine();
+                        isActive = false;
                         Notifiable.Notified -= NotifyWaiter;
                     }
                 }
             }
+
             Notifiable.Notified += NotifyWaiter;
         }
 
-        public static void SetEndon(this IEnumerator routine, params string[] endonNotifys)
+        public void SetEndon(params string[] endonNotifys)
         {
             void NotifyWaiter(int entRef, string message, Parameter[] parameters)
             {
+                if (!isActive)
+                {
+                    Notifiable.Notified -= NotifyWaiter;
+                    return;
+                }
 
                 foreach (string notify in endonNotifys)
                 {
                     if (notify == message)
                     {
-                        routine.RemoveRoutine();
+                        isActive = false;
                         Notifiable.Notified -= NotifyWaiter;
                     }
                 }
@@ -107,6 +105,8 @@ namespace InfinityScript
             while (watch.Elapsed.TotalSeconds < 0.0500000007450581)
                 yield return 0;
         }
+    }
+
 
         public static IEnumerator WaitTill(string notify)
         {
