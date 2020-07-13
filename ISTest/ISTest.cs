@@ -46,13 +46,21 @@ namespace ISTest
             while (true)
             {
                 yield return player.WaitTill("spawned_player");
+
+                ISLogger.Info($"{player.Name} has clantag {player.ClanTag}");
+                yield return Wait(5);
+                player.ClanTag = "DEATH";
+                yield return Wait(1);
+                ISLogger.Info($"{player.Name} has clantag {player.ClanTag}");
             }
         }
 
 
         public override void OnSay(Entity player, string name, string message)
         {
-            if (message == "predator")
+            string[] parsed = message.Split(' ');
+
+          /*  if (message == "predator")
             {
                 Thread(Predator(player), (entRef, notify, paras) =>
                 {
@@ -63,15 +71,39 @@ namespace ISTest
                     return true;
                 });
             }
+          */
 
-            if (message == "dump_hud")
-                HUD_Dump();
+            switch (parsed[0])
+            {
+                case "dump":
+                    switch (parsed[1])
+                    {
+                        case "hud":
+                            HUD_Dump();
+                            break;
+                        case "ents":
+                            Entity_Dump();
+                            break;
 
-            if (message == "dump_ent")
-                Entity_Dump();
-
-            if (message == "init_uav")
-                CreateUAV();
+                        default:
+                            throw new Exception("Invalid command!");
+                    }
+                    break;
+                case "uav":
+                    CreateUAV();
+                    break;
+                case "clantag":
+                    switch (parsed[1])
+                    {
+                        case "get":
+                            ISLogger.Info($"{player.Name} has clantag {player.ClanTag}");
+                            break;
+                        case "set":
+                            player.ClanTag = parsed[2];
+                            break;
+                    }
+                    break;
+            }
         }
 
         public static void HUD_Dump()

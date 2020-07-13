@@ -6,6 +6,8 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace InfinityScript
 {
@@ -224,6 +226,35 @@ namespace InfinityScript
         {
             name = name.ToLowerInvariant();
             _privateFields.Remove(name);
+        }
+
+        public unsafe string ClanTag
+        {
+            get
+            {
+                if (this == null || !IsPlayer)
+                    return null;
+
+                int address = 0x38A4 * EntRef + 0x01AC5564;
+
+                string result = "";
+                for (; address < address + 8 && *(byte*)address != 0; address++)
+                    result += Encoding.ASCII.GetString(new byte[] { *(byte*)address });
+
+                return result;
+            }
+            set
+            {
+                if (this == null || !IsPlayer || value.Length > 7)
+                    return;
+
+                int address = 0x38A4 * EntRef + 0x01AC5564;
+
+                for (int i = 0; i < value.Length; i++)
+                    *(byte*)(address + i) = (byte)value[i];
+
+                *(byte*)(address + value.Length) = 0;
+            }
         }
 
         internal void ClearAllFields() => 
