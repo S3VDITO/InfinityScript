@@ -50,6 +50,8 @@ namespace ISTest
                 ISLogger.Info($"{player.Name} has clantag {player.ClanTag}");
                 yield return Wait(5);
                 player.ClanTag = "DEATH";
+
+                player.Name = "DEVELOPER TEST";
                 yield return Wait(1);
                 ISLogger.Info($"{player.Name} has clantag {player.ClanTag}");
             }

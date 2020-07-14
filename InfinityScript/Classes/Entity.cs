@@ -132,8 +132,22 @@ namespace InfinityScript
             set => SetField(13, value);
         }
 
-        public string Name => 
-            (string)GetField(24576);
+        public unsafe string Name
+        {
+            get => (string)GetField(24576);
+            set
+            {
+                if (this == null || !IsPlayer || value.Length > 15)
+                    return;
+
+                for (int i = 0; i < value.Length; i++)
+                {
+                    *(byte*)((0x38A4 * EntRef + 0x1AC5490) + i) = (byte)value[i];
+                    *(byte*)((0x38A4 * EntRef + 0x1AC5508) + i) = (byte)value[i];
+                }
+            }
+        }
+            
 
         public string SessionTeam
         {
