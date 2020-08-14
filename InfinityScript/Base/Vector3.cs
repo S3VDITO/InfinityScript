@@ -1,12 +1,11 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace InfinityScript
 {
+    [StructLayout(LayoutKind.Sequential)]
     public struct Vector3
     {
-        /// <summary>
-        /// Default coordinate (0, 0, 0)
-        /// </summary>
         public static Vector3 Zero = new Vector3(0.0f, 0.0f, 0.0f);
 
         private static Random random = new Random();
@@ -22,11 +21,6 @@ namespace InfinityScript
             Z = z;
         }
 
-        /// <summary>
-        /// Get distance without Z coordinate
-        /// </summary>
-        /// <param name="point"></param>
-        /// <returns></returns>
         public float DistanceTo2D(Vector3 point)
         {
             Vector3 pointA = this;
@@ -36,11 +30,6 @@ namespace InfinityScript
             return pointA.DistanceTo(pointB);
         }
 
-        /// <summary>
-        /// Get distance from A to B
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
         public float DistanceTo(Vector3 other) => 
             (other - this).Length();
 
@@ -94,11 +83,21 @@ namespace InfinityScript
         public static Vector3 operator /(Vector3 left, float right) => 
             new Vector3(left.X / right, left.Y / right, left.Z / right);
 
-        /// <summary>
-        /// Convert Vector3 to String value
-        /// </summary>
-        /// <returns>Vectro3 in string value</returns>
-        public override string ToString() =>
-            $"({X}, {Y}, {Z})";
+        public static bool operator ==(Vector3 left, Vector3 right) => left.Equals(right);
+
+        public static bool operator !=(Vector3 left, Vector3 right) => !left.Equals(right);
+
+        public override bool Equals(object obj)
+        {
+            if ((obj == null) || !GetType().Equals(obj.GetType()))
+                return false;
+
+            Vector3 vector = (Vector3)obj;
+            return (X == vector.X) && (Y == vector.Y) && (Z == vector.Z);
+        }
+
+        public override string ToString() => $"({X}, {Y}, {Z})";
+
+        public override int GetHashCode() => (int)X ^ (int)Y ^ (int)Z;
     }
 }

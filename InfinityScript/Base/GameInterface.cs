@@ -1,8 +1,10 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace InfinityScript
 {
+    [Flags]
     public enum VariableType
     {
         Entity = 1,
@@ -13,6 +15,7 @@ namespace InfinityScript
         Integer = 6,
     }
 
+    [Flags]
     internal enum CallType
     {
         LastStand = -1, // 0xFFFFFFFF
@@ -25,6 +28,7 @@ namespace InfinityScript
         EndGame = 6,
     }
 
+    [Flags]
     public enum ServerCommand
     {
         chatMessage = 84, // 0x00000054
