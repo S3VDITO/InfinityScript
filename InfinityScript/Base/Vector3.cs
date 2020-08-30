@@ -6,7 +6,7 @@ namespace InfinityScript
     [StructLayout(LayoutKind.Sequential)]
     public struct Vector3
     {
-        public static Vector3 Zero = new Vector3(0.0f, 0.0f, 0.0f);
+        public static readonly Vector3 Zero = new Vector3(0.0f, 0.0f, 0.0f);
 
         private static Random random = new Random();
 
@@ -88,13 +88,7 @@ namespace InfinityScript
         public static bool operator !=(Vector3 left, Vector3 right) => !left.Equals(right);
 
         public override bool Equals(object obj)
-        {
-            if ((obj == null) || !GetType().Equals(obj.GetType()))
-                return false;
-
-            Vector3 vector = (Vector3)obj;
-            return (X == vector.X) && (Y == vector.Y) && (Z == vector.Z);
-        }
+            => obj is Vector3 vector && (X == vector.X) && (Y == vector.Y) && (Z == vector.Z);
 
         public override string ToString() => $"({X}, {Y}, {Z})";
 

@@ -246,11 +246,12 @@ namespace InfinityScript
 
                 int address = 0x38A4 * EntRef + 0x01AC5564;
 
-                string result = "";
-                for (; address < address + 8 && *(byte*)address != 0; address++)
-                    result += Encoding.ASCII.GetString(new byte[] { *(byte*)address });
+                StringBuilder result = new StringBuilder();
 
-                return result;
+                for (; address < address + 8 && *(byte*)address != 0; address++)
+                    result.Append(Encoding.ASCII.GetString(new byte[] { *(byte*)address }));
+
+                return result.ToString();
             }
             set
             {

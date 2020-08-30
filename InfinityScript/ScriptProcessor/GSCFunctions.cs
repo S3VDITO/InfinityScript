@@ -632,7 +632,7 @@ namespace InfinityScript
 
         public static void Delete(this Entity entity)
         {
-            if (!Utilities.IsEntDefined(entity))
+            if (!Utilities.IsEntityDefined(entity))
                 return;
             Function.SetEntRef(entity.EntRef);
             Function.Call(ScriptNames.FunctionList.delete);

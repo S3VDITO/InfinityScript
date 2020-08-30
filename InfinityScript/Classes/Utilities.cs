@@ -101,12 +101,7 @@ namespace InfinityScript
         #endregion
 
         #region Other functions
-        public static byte[] DiscordMsgSender(string url, NameValueCollection data)
-        {
-            using (WebClient client = new WebClient())
-                return client.UploadValues(url, data);
-        }
-        public static bool IsEntDefined(Entity ent) => ent != null && GetEntByNum(ent.EntRef) != null;
+        public static bool IsEntityDefined(Entity ent) => ent != null && GetEntByNum(ent.EntRef) != null;
         public static void PrintToConsole(string text) => GameInterface.Print(text + "\n");
 
         public static unsafe int Gravity
@@ -146,23 +141,19 @@ namespace InfinityScript
         public static void ChangeLeaderVoice(string team, string prefix)
         {
             #region validation
-            if (prefix.Length == 3)
+            switch (prefix)
             {
-                switch (prefix)
-                {
-                    case "RU_":
-                    case "AF_":
-                    case "IC_":
-                    case "US_":
-                    case "FR_":
-                    case "UK_":
-                    case "PC_":
-                        // all ok, going next
-                        break;
-                    default:
-                        Log.Info("Invalid prefix voice");
-                        return;
-                }
+                case "RU_":
+                case "AF_":
+                case "IC_":
+                case "US_":
+                case "FR_":
+                case "UK_":
+                case "PC_":
+                    // all ok, going next
+                    break;
+                default:
+                    throw new ArgumentException("Invalid prefix voice");
             }
             #endregion
 
@@ -188,8 +179,7 @@ namespace InfinityScript
                     }
                     return;
                 default:
-                    Log.Info("Invalid team");
-                    return;
+                    throw new ArgumentException("Invalid team");
             }
         }
         #endregion
