@@ -2,7 +2,7 @@
 
 Enhanced version of InfinityScript
 
-## What I modified/added
+## What modified/added
 
 * GetEntArray and SortByDistance can returns arrays, this was not achieved through in-game functions
 * Endon function added
