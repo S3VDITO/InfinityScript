@@ -62,10 +62,10 @@ namespace InfinityScript.Scripts
         }
 
         private void LoggerPlayerConnected(Entity player) =>
-            Write("J;{0};{1};{2}", player.GUID, player.EntRef, player.Name);
+            Write("J;{0};{1};{2}", player.HWID, player.EntRef, player.Name);
 
         public override void OnPlayerDisconnect(Entity player) =>
-            Write("Q;{0};{1};{2}", player.GUID, player.EntRef, player.Name);
+            Write("Q;{0};{1};{2}", player.HWID, player.EntRef, player.Name);
 
         public override void OnPlayerDamage(Entity player, Entity inflictor, Entity attacker, int damage, int dFlags, string mod, string weapon, Vector3 point, Vector3 dir, string hitLoc) =>
             Write("D;{0};{1};{2};{3};{4};{5}", GetDamageDetails(player), GetDamageDetails(attacker), weapon, damage, mod, hitLoc);
@@ -78,7 +78,7 @@ namespace InfinityScript.Scripts
             if (message.StartsWith("/"))
                 message = message.Substring(1);
 
-            Write("say;{0};{1};{2};{3}", player.GUID, player.EntRef, name, message);
+            Write("say;{0};{1};{2};{3}", player.HWID, player.EntRef, name, message);
         }
 
         public override void OnExitLevel()
@@ -90,7 +90,7 @@ namespace InfinityScript.Scripts
         {
             if (player == null || !player.IsPlayer)
                 return ";-1;world;world";
-            return string.Format("{0};{1};{2};{3}", player.GUID, player.EntRef, player.SessionTeam, player.Name);
+            return string.Format("{0};{1};{2};{3}", player.HWID, player.EntRef, player.SessionTeam, player.Name);
         }
         #endregion
 
