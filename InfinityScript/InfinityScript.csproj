@@ -68,7 +68,7 @@
     <Compile Include="ScriptProcessor\ScriptNames.cs" />
     <Compile Include="ScriptProcessor\ScriptProcessor.cs" />
     <Compile Include="ScriptProcessor\ThreadScript.cs" />
-    <Compile Include="Scripts\InternalScript.cs" />
+    <Compile Include="Scripts\GameLogger.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,10 +1,7 @@
-﻿using System;
-
-namespace InfinityScript
+﻿namespace InfinityScript
 {
     internal static class ScriptNames
     {
-        [Flags]
         /// CallID can not negative numbers
         internal enum FunctionList : uint
         {

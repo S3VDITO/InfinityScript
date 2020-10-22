@@ -246,7 +246,7 @@ namespace InfinityScript
 
                 int address = 0x38A4 * EntRef + 0x01AC5564;
 
-                StringBuilder result = new StringBuilder();
+                StringBuilder result = new StringBuilder(8);
 
                 for (; address < address + 8 && *(byte*)address != 0; address++)
                     result.Append(Encoding.ASCII.GetString(new byte[] { *(byte*)address }));

@@ -244,7 +244,6 @@ namespace InfinityScript
         /// <param name="message">Message</param>
         public static void AllClientPrint(string message) => GSCFunctions.AllClientsPrint(message);
 
-        [Flags]
         public enum EventEat
         {
             EatNone,
@@ -252,7 +251,6 @@ namespace InfinityScript
             EatGame,
         }
 
-        [Flags]
         public enum ChatType
         {
             All,
