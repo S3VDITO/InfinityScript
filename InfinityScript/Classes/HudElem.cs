@@ -37,8 +37,7 @@ namespace InfinityScript
             Children = new List<HudElem>();
         }
 
-        public static HudElem GetHudElem(int entRef) => 
-            new HudElem(new Entity(entRef));
+        public static HudElem GetHudElem(int entRef) =>  new HudElem(new Entity(entRef));
 
         public float X
         {
@@ -287,14 +286,11 @@ namespace InfinityScript
             set => Entity.SetField(11, value);
         }
 
-        public Parameter GetField(string name) => 
-            Entity.GetField(name);
+        public Parameter GetField(string name) => Entity.GetField(name);
 
-        public Parameter GetField(int index) => 
-            Entity.GetField(index);
+        public Parameter GetField(int index) => Entity.GetField(index);
 
-        public void SetField(string name, Parameter value) => 
-            Entity.SetField(name, value);
+        public void SetField(string name, Parameter value) =>  Entity.SetField(name, value);
 
         public static HudElem CreateFontString(Entity client, Fonts font, float fontScale)
         {
@@ -305,6 +301,7 @@ namespace InfinityScript
             hudElem.Y = 0.0f;
             hudElem.Height = (int)(12.0 * fontScale);
             hudElem.Parent = UIParent;
+
             return hudElem;
         }
 
@@ -317,6 +314,7 @@ namespace InfinityScript
             hudElem.Y = 0.0f;
             hudElem.Height = (int)(12.0 * fontScale);
             hudElem.Parent = UIParent;
+
             return hudElem;
         }
 
@@ -328,11 +326,13 @@ namespace InfinityScript
             hud.Width = width;
             hud.Height = height;
             hud.Parent = UIParent;
+
             if (shader != null)
             {
                 hud.SetShader(shader, width, height);
                 hud._shader = shader;
             }
+
             return hud;
         }
 
@@ -349,17 +349,13 @@ namespace InfinityScript
             }
         }
 
-        public void SetPoint(string point) =>
-            SetPoint(point, point, 0, 0, 0);
+        public void SetPoint(string point) => SetPoint(point, point, 0, 0, 0);
 
-        public void SetPoint(string point, string relativePoint) =>
-            SetPoint(point, relativePoint, 0, 0, 0);
+        public void SetPoint(string point, string relativePoint) => SetPoint(point, relativePoint, 0, 0, 0);
 
-        public void SetPoint(string point, string relativePoint, int xOffset) =>
-            SetPoint(point, relativePoint, xOffset, 0, 0);
+        public void SetPoint(string point, string relativePoint, int xOffset) => SetPoint(point, relativePoint, xOffset, 0, 0);
 
-        public void SetPoint(string point, string relativePoint, int xOffset, int yOffset) =>
-            SetPoint(point, relativePoint, xOffset, yOffset, 0);
+        public void SetPoint(string point, string relativePoint, int xOffset, int yOffset) => SetPoint(point, relativePoint, xOffset, yOffset, 0);
 
         public void SetPoint(string point, string relativePoint, int xOffset, int yOffset, float moveTime)
         {

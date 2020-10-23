@@ -14,48 +14,10 @@ namespace InfinityScript
             InternalValue = value;
         }
 
-        public static explicit operator int(Parameter p)
-        {
-            return Convert.ToInt32(p.InternalValue);
-        }
-
-        public static explicit operator bool(Parameter p)
-        {
-            return Convert.ToInt32(p.InternalValue) > 0;
-        }
-
-        public static explicit operator float(Parameter p)
-        {
-            return Convert.ToSingle(p.InternalValue);
-        }
-
-        public static explicit operator string(Parameter p)
-        {
-            return Convert.ToString(p.InternalValue);
-        }
-
-        public static explicit operator Entity(Parameter p)
-        {
-            return (Entity)p.InternalValue;
-        }
-
-        public static explicit operator HudElem(Parameter p)
-        {
-            return (HudElem)p.InternalValue;
-        }
-
-        public T As<T>() => 
-            (T)Convert.ChangeType(InternalValue, typeof(T));
-
         public Parameter(string v)
         {
             Type = VariableType.String;
             InternalValue = v;
-        }
-
-        public static implicit operator Parameter(string v)
-        {
-            return new Parameter(v);
         }
 
         public Parameter(int v)
@@ -64,20 +26,10 @@ namespace InfinityScript
             InternalValue = v;
         }
 
-        public static implicit operator Parameter(int v)
-        {
-            return new Parameter(v);
-        }
-
         public Parameter(float v)
         {
             Type = VariableType.Float;
             InternalValue = v;
-        }
-
-        public static implicit operator Parameter(float v)
-        {
-            return new Parameter(v);
         }
 
         public Parameter(Vector3 v)
@@ -86,20 +38,10 @@ namespace InfinityScript
             InternalValue = v;
         }
 
-        public static implicit operator Parameter(Vector3 v)
-        {
-            return new Parameter(v);
-        }
-
         public Parameter(Entity v)
         {
             Type = VariableType.Entity;
             InternalValue = v;
-        }
-
-        public static implicit operator Parameter(Entity v)
-        {
-            return new Parameter(v);
         }
 
         public Parameter(HudElem v)
@@ -108,20 +50,7 @@ namespace InfinityScript
             InternalValue = v;
         }
 
-        public static implicit operator Parameter(HudElem v)
-        {
-            return new Parameter(v);
-        }
-
-        public static implicit operator Parameter(bool v)
-        {
-            return new Parameter(v ? 1 : 0);
-        }
-
-        public Parameter(object v)
-        {
-            InternalValue = v;
-        }
+        public Parameter(object v) => InternalValue = v;
 
         internal void PushValue()
         {
@@ -147,10 +76,36 @@ namespace InfinityScript
             }
         }
 
-        public bool IsNull => 
-            InternalValue == null;
+        public static explicit operator int(Parameter p) => Convert.ToInt32(p.InternalValue);
 
-        public override string ToString() =>
-            InternalValue.ToString();
+        public static explicit operator bool(Parameter p) => Convert.ToInt32(p.InternalValue) > 0;
+
+        public static explicit operator float(Parameter p) => Convert.ToSingle(p.InternalValue);
+
+        public static explicit operator string(Parameter p) => Convert.ToString(p.InternalValue);
+
+        public static explicit operator Entity(Parameter p) => (Entity)p.InternalValue;
+
+        public static explicit operator HudElem(Parameter p) => (HudElem)p.InternalValue;
+
+        public static implicit operator Parameter(string v) => new Parameter(v);
+
+        public static implicit operator Parameter(int v) => new Parameter(v);
+
+        public static implicit operator Parameter(float v) => new Parameter(v);
+
+        public static implicit operator Parameter(Vector3 v) => new Parameter(v);
+
+        public static implicit operator Parameter(Entity v) => new Parameter(v);
+
+        public static implicit operator Parameter(HudElem v) => new Parameter(v);
+
+        public static implicit operator Parameter(bool v) => new Parameter(v ? 1 : 0);
+
+        public T As<T>() => (T)Convert.ChangeType(InternalValue, typeof(T));
+
+        public bool IsNull =>  InternalValue == null;
+
+        public override string ToString() => InternalValue.ToString();
     }
 }

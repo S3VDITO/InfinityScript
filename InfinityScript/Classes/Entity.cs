@@ -365,16 +365,11 @@ namespace InfinityScript
         /// </summary>
         /// <param name="entRef">Entity number</param>
         /// <returns></returns>
-        public static Entity GetEntity(int entRef)
-        {
-            return new Entity(entRef);
-        }
+        public static Entity GetEntity(int entRef) => new Entity(entRef);
 
-        public int UserID => 
-            (int)(GUID & uint.MaxValue);
+        public int UserID => (int)(GUID & uint.MaxValue);
 
-        public int Ping => 
-            GameInterface.GetPing(EntRef);
+        public int Ping =>  GameInterface.GetPing(EntRef);
 
         public IPEndPoint IP
         {
@@ -385,16 +380,12 @@ namespace InfinityScript
             }
         }
 
-        public string HWID => 
-            GameInterface.GetEntrefHWID(EntRef);
+        public string HWID =>  GameInterface.GetEntrefHWID(EntRef);
 
-        public override string ToString() => 
-            $"[Entity:{EntRef >> 16}:{EntRef & ushort.MaxValue}]";
+        public override string ToString() =>  $"[Entity:{EntRef >> 16}:{EntRef & ushort.MaxValue}]";
 
-        public override int GetHashCode() => 
-            EntRef;
+        public override int GetHashCode() => EntRef;
 
-        public override bool Equals(object obj) =>
-            obj is Entity entity && entity.EntRef == EntRef;
+        public override bool Equals(object obj) => obj is Entity entity && entity.EntRef == EntRef;
     }
 }

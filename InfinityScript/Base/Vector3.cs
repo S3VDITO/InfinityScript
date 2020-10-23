@@ -8,7 +8,7 @@ namespace InfinityScript
     {
         public static readonly Vector3 Zero = new Vector3(0.0f, 0.0f, 0.0f);
 
-        private static Random random = new Random();
+        private static Random _random = new Random();
 
         public float X;
         public float Y;
@@ -41,7 +41,7 @@ namespace InfinityScript
 
         public static Vector3 RandomXY()
         {
-            Vector3 vector3 = new Vector3((float)(random.NextDouble() - 0.5), (float)(random.NextDouble() - 0.5), 0.0f);
+            Vector3 vector3 = new Vector3((float)(_random.NextDouble() - 0.5), (float)(_random.NextDouble() - 0.5), 0.0f);
             vector3.Normalize();
             return vector3;
         }
@@ -59,36 +59,27 @@ namespace InfinityScript
             Z *= b;
         }
 
-        public static Vector3 operator -(Vector3 left, Vector3 right) => 
-            new Vector3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
+        public static Vector3 operator -(Vector3 left, Vector3 right) =>  new Vector3(left.X - right.X, left.Y - right.Y, left.Z - right.Z);
 
-        public static Vector3 operator -(Vector3 left, float right) =>
-            new Vector3(left.X - right, left.Y - right, left.Z - right);
+        public static Vector3 operator -(Vector3 left, float right) => new Vector3(left.X - right, left.Y - right, left.Z - right);
 
-        public static Vector3 operator +(Vector3 left, Vector3 right) =>
-            new Vector3(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
+        public static Vector3 operator +(Vector3 left, Vector3 right) => new Vector3(left.X + right.X, left.Y + right.Y, left.Z + right.Z);
 
-        public static Vector3 operator +(Vector3 left, float right) =>
-            new Vector3(left.X + right, left.Y + right, left.Z + right);
+        public static Vector3 operator +(Vector3 left, float right) => new Vector3(left.X + right, left.Y + right, left.Z + right);
 
-        public static Vector3 operator *(Vector3 left, Vector3 right) =>
-            new Vector3(left.X * right.X, left.Y * right.Y, left.Z * right.Z);
+        public static Vector3 operator *(Vector3 left, Vector3 right) => new Vector3(left.X * right.X, left.Y * right.Y, left.Z * right.Z);
 
-        public static Vector3 operator *(Vector3 left, float right) => 
-            new Vector3(left.X * right, left.Y * right, left.Z * right);
+        public static Vector3 operator *(Vector3 left, float right) => new Vector3(left.X * right, left.Y * right, left.Z * right);
 
-        public static Vector3 operator /(Vector3 left, Vector3 right) => 
-            new Vector3(left.X / right.X, left.Y / right.Y, left.Z / right.Z);
+        public static Vector3 operator /(Vector3 left, Vector3 right) => new Vector3(left.X / right.X, left.Y / right.Y, left.Z / right.Z);
 
-        public static Vector3 operator /(Vector3 left, float right) => 
-            new Vector3(left.X / right, left.Y / right, left.Z / right);
+        public static Vector3 operator /(Vector3 left, float right) => new Vector3(left.X / right, left.Y / right, left.Z / right);
 
         public static bool operator ==(Vector3 left, Vector3 right) => left.Equals(right);
 
         public static bool operator !=(Vector3 left, Vector3 right) => !left.Equals(right);
 
-        public override bool Equals(object obj)
-            => obj is Vector3 vector && (X == vector.X) && (Y == vector.Y) && (Z == vector.Z);
+        public override bool Equals(object obj) => obj is Vector3 vector && (X == vector.X) && (Y == vector.Y) && (Z == vector.Z);
 
         public override string ToString() => $"({X}, {Y}, {Z})";
 

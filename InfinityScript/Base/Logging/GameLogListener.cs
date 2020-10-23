@@ -2,8 +2,7 @@
 {
     public class GameLogListener : ILogListener
     {
-        public void LogMessage(string source, string message, LogLevel level) =>
-            GameInterface.Print($"[{source}] {message}\n");
+        public void LogMessage(string source, string message, LogLevel level) => GameInterface.Print($"[{source}] {message}\n");
 
         public bool WantsFilteredMessages { get; } = true;
     }

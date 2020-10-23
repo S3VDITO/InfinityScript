@@ -1,18 +1,17 @@
-﻿namespace InfinityScript
+﻿using System.Linq;
+
+namespace InfinityScript
 {
     internal static class Function
     {
         private static int _entRef;
         private static object _returnValue;
 
-        internal static void SetEntRef(int entRef) =>
-            _entRef = entRef;
+        internal static void SetEntRef(int entRef) => _entRef = entRef;
 
-        internal static void Call(ScriptNames.FunctionList func, params Parameter[] parameters) =>
-            CallRaw((uint)func, parameters);
+        internal static void Call(ScriptNames.FunctionList func, params Parameter[] parameters) => CallRaw((uint)func, parameters);
 
-        internal static object GetReturns() =>
-            _returnValue;
+        internal static object GetReturns() => _returnValue;
 
         private static void CallRaw(uint identifier, params Parameter[] parameters)
         {
@@ -22,6 +21,7 @@
             GameInterface.Script_Call((int)identifier, _entRef, parameters.Length);
             SetEntRef(-1);
             _returnValue = null;
+
             if (GameInterface.Notify_NumArgs() == 1)
             {
                 switch (GameInterface.Script_GetType(0))

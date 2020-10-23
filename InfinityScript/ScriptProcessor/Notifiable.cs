@@ -15,7 +15,7 @@ namespace InfinityScript
         }
 
         public static event Action<int, string, Parameter[]> Notified;
-
+        
         internal void ProcessNotifications()
         {
             // handle notify events

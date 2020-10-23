@@ -10,6 +10,7 @@ namespace InfinityScript
             Log.AddListener(new FileLogListener("InfinityScript.log", false));
             Log.AddListener(new TraceLogListener());
             Log.AddListener(new GameLogListener());
+
             try
             {
                 ScriptLoader.Initialize();
@@ -34,11 +35,9 @@ namespace InfinityScript
             }
         }
 
-        public static void Shutdown() =>
-            ScriptProcessor.RunAll(script => script.OnExitLevel());
+        public static void Shutdown() => ScriptProcessor.RunAll(script => script.OnExitLevel());
 
-        public static void LoadScript(string scriptName) =>
-            ScriptLoader.LoadAssemblies("scripts", scriptName);
+        public static void LoadScript(string scriptName) => ScriptLoader.LoadAssemblies("scripts", scriptName);
 
         public static bool HandleSay(int clientNum, string clientName, ref string message, int team)
         {
@@ -49,7 +48,6 @@ namespace InfinityScript
 
             ScriptProcessor.RunAll(script =>
             {
-
                 // Run Script.OnSay3 (by reference, with team and eat)
                 if (eatscript)
                     return;
@@ -108,6 +106,7 @@ namespace InfinityScript
                 case CallType.PlayerKilled:
                     if (paras[5].IsNull)
                         paras[5] = new Vector3(0.0f, 0.0f, 0.0f);
+
                     ScriptProcessor.RunAll(script => script.OnPlayerKilled(entity, paras[0].As<Entity>(), paras[1].As<Entity>(), paras[2].As<int>(), paras[3].As<string>(), paras[4].As<string>(), paras[5].As<Vector3>(), paras[6].As<string>()));
                     break;
                 case CallType.VehicleDamage:
@@ -159,6 +158,7 @@ namespace InfinityScript
             {
                 eat = script.OnServerCommand(commandName.ToLowerInvariant(), args);
             });
+
             return eat;
         }
 
@@ -183,6 +183,7 @@ namespace InfinityScript
         public static bool HandleClientConnect(string connectString)
         {
             bool eat = false;
+
             try
             {
                 string playerName = connectString.Split(new[] { "name" }, StringSplitOptions.None)[1];
@@ -203,11 +204,13 @@ namespace InfinityScript
 
                     GameInterface.SetConnectErrorMsg(error);
                 });
+
                 return eat;
             }
             catch (Exception ex)
             {
                 Utilities.PrintToConsole($"[InfinityScript] An error occurred during the handling of a client connecting!: {ex.Message}\nAdditional Info:{ex.Data}");
+                
                 return false;
             }
         }
