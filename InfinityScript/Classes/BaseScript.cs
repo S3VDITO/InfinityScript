@@ -83,6 +83,7 @@ namespace InfinityScript
         /// <param name="player">Player</param>
         public virtual void OnPlayerConnecting(Entity player)
         {
+            Players.Add(player);
         }
 
         /// <summary>
