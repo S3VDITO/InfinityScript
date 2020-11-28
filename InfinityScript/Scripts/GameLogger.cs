@@ -23,7 +23,7 @@ namespace InfinityScript
             PlayerConnected += player => Write("J;{0};{1};{2}", player.HWID, player.EntRef, player.Name);
         }
 
-        private static void Write(string format, params object[] args)
+        public static void Write(string format, params object[] args)
         {
             _writer.Write(FormatTime(DateTime.Now - _startTime));
             _writer.Write(" ");
