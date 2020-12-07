@@ -267,6 +267,36 @@ namespace InfinityScript
             }
         }
 
+        public unsafe string PlayerCardTitle
+        {
+            get
+            {
+                if (this == null || !IsPlayer)
+                    return null;
+
+                int address = 0x38A4 * EntRef + 0x01AC5548;
+
+                StringBuilder result = new StringBuilder();
+
+                for (; address < address + 8 && *(byte*)address != 0; address++)
+                    result.Append(Encoding.ASCII.GetString(new byte[] { *(byte*)address }));
+
+                return result.ToString();
+            }
+            set
+            {
+                if (this == null || !IsPlayer || value.Length > 25)
+                    return;
+
+                int address = 0x38A4 * EntRef + 0x01AC5548;
+
+                for (int i = 0; i < value.Length; i++)
+                    *(byte*)(address + i) = (byte)value[i];
+
+                *(byte*)(address + value.Length) = 0;
+            }
+        }
+
         internal void ClearAllFields() => 
             _privateFields.Clear();
 
