@@ -14,7 +14,7 @@ namespace InfinityScript
         private int _xOffset;
         private int _yOffset;
         private string _point;
-        private string _relativePoint;
+        private string _relativePoint = string.Empty;
 
         internal HudElem(Entity entity)
         {
