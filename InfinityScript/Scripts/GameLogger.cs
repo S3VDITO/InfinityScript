@@ -1,8 +1,8 @@
-﻿using System;
-using System.IO;
-
-namespace InfinityScript
+﻿namespace InfinityScript
 {
+    using System;
+    using System.IO;
+
     public class GameLogger : BaseScript
     {
         private static string _logPathName;
@@ -12,7 +12,7 @@ namespace InfinityScript
 
         public GameLogger()
         {
-            _logPathName = $"scripts/{GSCFunctions.GetDvar("g_log").Replace("/", "").Replace("\\", "")}";
+            _logPathName = $"scripts/{GSCFunctions.GetDvar("g_log").Replace("/", string.Empty).Replace("\\", string.Empty)}";
             _fileStream = File.Open(_logPathName, FileMode.Append, FileAccess.Write, FileShare.ReadWrite);
             _writer = new StreamWriter(_fileStream);
             _startTime = DateTime.Now;
@@ -31,12 +31,6 @@ namespace InfinityScript
             _writer.Flush();
         }
 
-        private static string FormatTime(TimeSpan duration)
-        {
-            int totalSeconds = (int)duration.TotalSeconds;
-            return string.Format("{0}:{1}", totalSeconds / 60, (totalSeconds % 60).ToString().PadLeft(2, '0')).PadLeft(6, ' ');
-        }
-
         public override void OnExitLevel() =>
             Write("OnExitLevel: executed");
 
@@ -52,15 +46,25 @@ namespace InfinityScript
         public override void OnSay(Entity player, string name, string message)
         {
             if (message.StartsWith("/"))
+            {
                 message = message.Substring(1);
+            }
 
             Write("say;{0};{1};{2};{3}", player.HWID, player.EntRef, name, message);
+        }
+
+        private static string FormatTime(TimeSpan duration)
+        {
+            int totalSeconds = (int)duration.TotalSeconds;
+            return string.Format("{0}:{1}", totalSeconds / 60, (totalSeconds % 60).ToString().PadLeft(2, '0')).PadLeft(6, ' ');
         }
 
         private string GetDamageDetails(Entity player)
         {
             if (player == null || !player.IsPlayer)
+            {
                 return ";-1;world;world";
+            }
 
             return string.Format("{0};{1};{2};{3}", player.HWID, player.EntRef, player.SessionTeam, player.Name);
         }

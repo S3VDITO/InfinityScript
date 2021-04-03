@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace InfinityScript
+﻿namespace InfinityScript
 {
     internal static class Function
     {
@@ -16,7 +14,9 @@ namespace InfinityScript
         private static void CallRaw(uint identifier, params Parameter[] parameters)
         {
             for (int index = parameters.Length - 1; index >= 0; --index)
+            {
                 parameters[index].PushValue();
+            }
 
             GameInterface.Script_Call((int)identifier, _entRef, parameters.Length);
             SetEntRef(-1);
@@ -45,6 +45,7 @@ namespace InfinityScript
                         break;
                 }
             }
+
             GameInterface.Script_CleanReturnStack();
         }
     }

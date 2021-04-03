@@ -138,7 +138,7 @@ namespace ISTest
                     sw.WriteLine($"ClassName: {ent.Classname}");
                     sw.WriteLine($"Target: {ent.Target}");
                     sw.WriteLine($"SpawnFlags: {ent.SpawnFlags}");
-                    sw.WriteLine($"dmg: {ent.dmg}");
+                    sw.WriteLine($"dmg: {ent.Dmg}");
                     sw.WriteLine($"Code_ClassName: {ent.Code_Classname}");
                     sw.WriteLine($"Model: {ent.Model}");
                     sw.WriteLine("---------------------------------------------------------------");

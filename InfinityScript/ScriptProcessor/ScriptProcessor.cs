@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace InfinityScript
+﻿namespace InfinityScript
 {
+    using System;
+    using System.Collections.Generic;
+
     internal static class ScriptProcessor
     {
-        internal static List<BaseScript> Scripts = new List<BaseScript>();
+        internal static readonly List<BaseScript> Scripts = new List<BaseScript>();
 
-        public static void AddScript(BaseScript script) => 
+        public static void AddScript(BaseScript script) =>
             Scripts.Add(script);
 
         public static void RunAll(Action<BaseScript> cb)

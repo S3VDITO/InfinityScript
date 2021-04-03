@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace InfinityScript
+﻿namespace InfinityScript
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public static class GSCFunctions
     {
         public static bool AnimHasNoteTrack(string animation, string noteTrackName)
@@ -124,9 +124,14 @@ namespace InfinityScript
         {
             Function.SetEntRef(player.EntRef);
             if (duration != -1)
+            {
                 Function.Call(ScriptNames.FunctionList.cloneplayer, duration);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.cloneplayer);
+            }
+
             return (Entity)Function.GetReturns();
         }
 
@@ -229,7 +234,9 @@ namespace InfinityScript
                 Function.Call(ScriptNames.FunctionList.setrank, rank, nullable.HasValue ? (Parameter)nullable.GetValueOrDefault() : null);
             }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.setrank, rank);
+            }
         }
 
         public static void SetSpawnWeapon(this Entity player, string weapon)
@@ -278,29 +285,45 @@ namespace InfinityScript
         {
             Function.SetEntRef(player.EntRef);
             if (inflictor == null && attacker != null)
+            {
                 Function.Call(ScriptNames.FunctionList.finishplayerdamage, string.Empty, attacker, damage, damageFlags, meansOfDeath, weapon, point, direction, hitLocation, offsetTime);
+            }
             else if (attacker == null && inflictor != null)
+            {
                 Function.Call(ScriptNames.FunctionList.finishplayerdamage, inflictor, string.Empty, damage, damageFlags, meansOfDeath, weapon, point, direction, hitLocation, offsetTime);
+            }
             else if (attacker == null && inflictor == null)
+            {
                 Function.Call(ScriptNames.FunctionList.finishplayerdamage, string.Empty, string.Empty, damage, damageFlags, meansOfDeath, weapon, point, direction, hitLocation, offsetTime);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.finishplayerdamage, inflictor, attacker, damage, damageFlags, meansOfDeath, weapon, point, direction, hitLocation, offsetTime);
+            }
         }
 
         public static void GlassRadiusDamage(Vector3 origin, int range, int maxDamage, int minDamage, Entity attacker = null)
         {
             if (attacker == null)
+            {
                 Function.Call(ScriptNames.FunctionList.glassradiusdamage, origin, range, maxDamage, minDamage);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.glassradiusdamage, origin, range, maxDamage, minDamage, attacker);
+            }
         }
 
         public static void RadiusDamage(Vector3 origin, int range, int maxDamage, int minDamage, Entity attacker = null)
         {
             if (attacker == null)
+            {
                 Function.Call(ScriptNames.FunctionList.radiusdamage, origin, range, maxDamage, minDamage);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.radiusdamage, origin, range, maxDamage, minDamage, attacker);
+            }
         }
 
         public static void RadiusDamage(this Entity entity, Vector3 origin, int range, int maxDamage, int minDamage, Entity attacker, string meansOfDeath, string weapon)
@@ -366,7 +389,9 @@ namespace InfinityScript
         public static void Line(Vector3 start, Vector3 end, Vector3? color = null, bool depthTest = false, int duration = 0)
         {
             if (!color.HasValue)
+            {
                 color = new Vector3?(Vector3.Zero);
+            }
 
             Function.Call(ScriptNames.FunctionList.line, start, end, color.HasValue ? (Parameter)color.GetValueOrDefault() : null, depthTest, duration);
         }
@@ -520,21 +545,33 @@ namespace InfinityScript
         public static void PlayFX(int effect, Vector3 position, Vector3? forward = null, Vector3? up = null)
         {
             if (forward.HasValue && up.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.playfx, effect, position, forward.HasValue ? (Parameter)forward.GetValueOrDefault() : null, up.HasValue ? (Parameter)up.GetValueOrDefault() : null);
+            }
             else if (forward.HasValue && !up.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.playfx, effect, position, forward.HasValue ? (Parameter)forward.GetValueOrDefault() : null);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.playfx, effect, position);
+            }
         }
 
         public static Entity PlayFX_Ret(int effect, Vector3 position, Vector3? forward = null, Vector3? up = null)
         {
             if (forward.HasValue && up.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.playfx, effect, position, forward.HasValue ? (Parameter)forward.GetValueOrDefault() : null, up.HasValue ? (Parameter)up.GetValueOrDefault() : null);
+            }
             else if (forward.HasValue && !up.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.playfx, effect, position, forward.HasValue ? (Parameter)forward.GetValueOrDefault() : null);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.playfx, effect, position);
+            }
 
             return (Entity)Function.GetReturns();
         }
@@ -593,11 +630,17 @@ namespace InfinityScript
         public static Entity PlayLoopedFX(int effect, float time, Vector3 origin, int offset = 0, Vector3? forward = null, Vector3? up = null)
         {
             if (!forward.HasValue && !up.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.playloopedfx, effect, time, origin, offset);
+            }
             else if (!up.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.playloopedfx, effect, time, origin, offset, forward.HasValue ? (Parameter)forward.GetValueOrDefault() : null);
+            }
             else if (!forward.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.playloopedfx, effect, time, origin, offset, forward.HasValue ? (Parameter)forward.GetValueOrDefault() : null, up.HasValue ? (Parameter)up.GetValueOrDefault() : null);
+            }
 
             return (Entity)Function.GetReturns();
         }
@@ -633,7 +676,10 @@ namespace InfinityScript
         public static void Delete(this Entity entity)
         {
             if (!Utilities.IsEntityDefined(entity))
+            {
                 return;
+            }
+
             Function.SetEntRef(entity.EntRef);
             Function.Call(ScriptNames.FunctionList.delete);
         }
@@ -642,9 +688,13 @@ namespace InfinityScript
         {
             Function.SetEntRef(entity.EntRef);
             if (newAttacker == null)
+            {
                 Function.Call(ScriptNames.FunctionList.detonate);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.detonate, newAttacker);
+            }
         }
 
         public static void DisableAimAssist(this Entity entity)
@@ -673,12 +723,16 @@ namespace InfinityScript
                 if (key == "targetname")
                 {
                     if (Entity.GetEntity(i).TargetName == name)
+                    {
                         ents.Add(Entity.GetEntity(i));
+                    }
                 }
                 else if (key == "target")
                 {
                     if (Entity.GetEntity(i).TargetName == name)
+                    {
                         ents.Add(Entity.GetEntity(i));
+                    }
                 }
             }
 
@@ -721,10 +775,14 @@ namespace InfinityScript
         public static void HidePart(this Entity entity, string tag, string model = "")
         {
             Function.SetEntRef(entity.EntRef);
-            if (model != "")
+            if (!string.IsNullOrEmpty(model))
+            {
                 Function.Call(ScriptNames.FunctionList.hidepart, tag, model);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.hidepart, tag);
+            }
         }
 
         public static bool IsTouching(this Entity ent, Entity entity)
@@ -749,22 +807,35 @@ namespace InfinityScript
         public static void LinkTo(this Entity ent, Entity entity, string tag = "", Vector3? originOffset = null, Vector3? anglesOffset = null)
         {
             Function.SetEntRef(ent.EntRef);
-            if (tag == "")
-                Function.Call(ScriptNames.FunctionList.linkto, entity);
-            else if (tag != "" && !originOffset.HasValue)
+            if (string.IsNullOrEmpty(tag))
             {
-                Function.Call(ScriptNames.FunctionList.linkto, entity, tag);
+                Function.Call(ScriptNames.FunctionList.linkto, entity);
             }
             else
             {
-                if (!originOffset.HasValue)
-                    return;
-                if (!originOffset.HasValue)
-                    originOffset = new Vector3?(Vector3.Zero);
-                if (!anglesOffset.HasValue)
-                    anglesOffset = new Vector3?(Vector3.Zero);
+                if (!string.IsNullOrEmpty(tag) && !originOffset.HasValue)
+                {
+                    Function.Call(ScriptNames.FunctionList.linkto, entity, tag);
+                }
+                else
+                {
+                    if (!originOffset.HasValue)
+                    {
+                        return;
+                    }
 
-                Function.Call(ScriptNames.FunctionList.linkto, entity, tag, originOffset.HasValue ? (Parameter)originOffset.GetValueOrDefault() : null, anglesOffset.HasValue ? (Parameter)anglesOffset.GetValueOrDefault() : null);
+                    if (!originOffset.HasValue)
+                    {
+                        originOffset = new Vector3?(Vector3.Zero);
+                    }
+
+                    if (!anglesOffset.HasValue)
+                    {
+                        anglesOffset = new Vector3?(Vector3.Zero);
+                    }
+
+                    Function.Call(ScriptNames.FunctionList.linkto, entity, tag, originOffset.HasValue ? (Parameter)originOffset.GetValueOrDefault() : null, anglesOffset.HasValue ? (Parameter)anglesOffset.GetValueOrDefault() : null);
+                }
             }
         }
 
@@ -820,10 +891,14 @@ namespace InfinityScript
         public static void ShowPart(this Entity entity, string tag, string model = "")
         {
             Function.SetEntRef(entity.EntRef);
-            if (model != "")
+            if (!string.IsNullOrEmpty(model))
+            {
                 Function.Call(ScriptNames.FunctionList.showpart, tag, model);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.showpart, tag);
+            }
         }
 
         public static void ShowToPlayer(this Entity entity, Entity player)
@@ -854,11 +929,17 @@ namespace InfinityScript
         {
             Function.SetEntRef(entity.EntRef);
             if (forward.HasValue && up.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.target_playfx, effect, position, forward.HasValue ? (Parameter)forward.GetValueOrDefault() : null, up.HasValue ? (Parameter)up.GetValueOrDefault() : null);
+            }
             else if (forward.HasValue && !up.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.target_playfx, effect, position, forward.HasValue ? (Parameter)forward.GetValueOrDefault() : null);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.target_playfx, effect, position);
+            }
         }
 
         public static Entity DropScavengerBag(this Entity entity, string item)
@@ -877,10 +958,14 @@ namespace InfinityScript
         public static void Detach(this Entity entity, string model, string tag = "")
         {
             Function.SetEntRef(entity.EntRef);
-            if (tag != "")
+            if (!string.IsNullOrEmpty(tag))
+            {
                 Function.Call(ScriptNames.FunctionList.detach, model, tag);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.detach, model);
+            }
         }
 
         public static void DetachAll(this Entity entity)
@@ -1049,10 +1134,14 @@ namespace InfinityScript
         public static void CameraLinkTo(this Entity ent, Entity entity, string tag = "")
         {
             Function.SetEntRef(ent.EntRef);
-            if (tag != "")
+            if (!string.IsNullOrEmpty(tag))
+            {
                 Function.Call(ScriptNames.FunctionList.cameralinkto, entity, tag);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.cameralinkto, entity);
+            }
         }
 
         public static void CameraLinkTo(this Entity ent, Entity entity, string tag, Vector3 originOffset, Vector3 anglesOffset)
@@ -1366,7 +1455,7 @@ namespace InfinityScript
         {
             Function.SetEntRef(hud.Entity.EntRef);
             Function.Call(ScriptNames.FunctionList.setshader, material, width, height);
-            hud._shader = material;
+            hud.ShaderI = material;
             hud.Width = width;
             hud.Height = height;
         }
@@ -1682,7 +1771,7 @@ namespace InfinityScript
         {
             List<Parameter> parametersArray = new List<Parameter>()
             {
-                rule
+                rule,
             };
             parametersArray = parametersArray.Concat(parameters.Select(x => new Parameter(x))).ToList();
             Function.Call(ScriptNames.FunctionList.getmatchrulesdata, parametersArray.ToArray());
@@ -2223,12 +2312,18 @@ namespace InfinityScript
 
         public static void Objective_Add(int objectiveNumber, string state, Vector3? position = null, string shader = "")
         {
-            if (!position.HasValue && shader == "")
+            if (!position.HasValue && shader == string.Empty)
+            {
                 Function.Call(ScriptNames.FunctionList.objective_add, objectiveNumber, state);
-            else if (shader == "")
+            }
+            else if (shader == string.Empty)
+            {
                 Function.Call(ScriptNames.FunctionList.objective_add, objectiveNumber, state, position.HasValue ? (Parameter)position.GetValueOrDefault() : null);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.objective_add, objectiveNumber, state, position.HasValue ? (Parameter)position.GetValueOrDefault() : null, shader);
+            }
         }
 
         public static void Objective_Current(int objectiveIndex, params int[] additionalIndex)
@@ -2574,10 +2669,14 @@ namespace InfinityScript
         public static void PlayerLinkTo(this Entity player, Entity entity, string tag = "")
         {
             Function.SetEntRef(player.EntRef);
-            if (tag != "")
+            if (!string.IsNullOrEmpty(tag))
+            {
                 Function.Call(ScriptNames.FunctionList.playerlinkto, entity, tag);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.playerlinkto, entity);
+            }
         }
 
         public static void PlayerLinkTo(this Entity player, Entity entity, string tag, float viewFraction)
@@ -2619,19 +2718,27 @@ namespace InfinityScript
         public static void PlayerLinkToAbsolute(this Entity player, Entity entity, string tag = "")
         {
             Function.SetEntRef(player.EntRef);
-            if (tag != "")
+            if (!string.IsNullOrEmpty(tag))
+            {
                 Function.Call(ScriptNames.FunctionList.playerlinktoabsolute, entity, tag);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.playerlinktoabsolute, entity);
+            }
         }
 
         public static void PlayerLinkToDelta(this Entity player, Entity entity, string tag = "")
         {
             Function.SetEntRef(player.EntRef);
-            if (tag != "")
+            if (!string.IsNullOrEmpty(tag))
+            {
                 Function.Call(ScriptNames.FunctionList.playerlinktodelta, entity, tag);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.playerlinktodelta, entity);
+            }
         }
 
         public static void PlayerLinkToDelta(this Entity player, Entity entity, string tag, float viewFraction)
@@ -2692,10 +2799,14 @@ namespace InfinityScript
         public static void SetActionSlot(this Entity entity, int slot, string option, string weapon = "")
         {
             Function.SetEntRef(entity.EntRef);
-            if (weapon != "")
+            if (!string.IsNullOrEmpty(weapon))
+            {
                 Function.Call(ScriptNames.FunctionList.setactionslot, slot, option, weapon);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.setactionslot, slot, option);
+            }
         }
 
         public static void SetChannelVolumes(this Entity entity, string priority, string shockName, float fade = 0.0f)
@@ -2714,7 +2825,8 @@ namespace InfinityScript
         {
             List<Parameter> parametersArray = new List<Parameter>()
             {
-                dvar, value
+                dvar,
+                value,
             };
             parametersArray = parametersArray.Concat(additionalValues).ToList();
 
@@ -3317,10 +3429,14 @@ namespace InfinityScript
         public static void PlayerLinkToBlend(this Entity player, Entity entity, string tag = "", float viewFraction = 0.0f, int rightArc = 180, int leftArc = 180, int topArc = 180, int bottomArc = 180, bool collide = false)
         {
             Function.SetEntRef(player.EntRef);
-            if (tag != "")
+            if (!string.IsNullOrEmpty(tag))
+            {
                 Function.Call(ScriptNames.FunctionList.playerlinktoblend, entity, tag, viewFraction, rightArc, leftArc, topArc, bottomArc, collide);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.playerlinktoblend, entity);
+            }
         }
 
         public static void PlayerLinkedOffsetEnable(this Entity entity)
@@ -3545,10 +3661,10 @@ namespace InfinityScript
             Function.Call(ScriptNames.FunctionList.setempjammed, jammed);
         }
 
-        public static void PlayerSetExpFog(this Entity entity, float startDist, float halfwayDist, Vector3 RGB, float transitionTime)
+        public static void PlayerSetExpFog(this Entity entity, float startDist, float halfwayDist, Vector3 rgb, float transitionTime)
         {
             Function.SetEntRef(entity.EntRef);
-            Function.Call(ScriptNames.FunctionList.playersetexpfog, startDist, halfwayDist, RGB.X, RGB.Y, RGB.Z, transitionTime);
+            Function.Call(ScriptNames.FunctionList.playersetexpfog, startDist, halfwayDist, rgb.X, rgb.Y, rgb.Z, transitionTime);
         }
 
         public static bool IsItemUnlocked(this Entity entity, string item)
@@ -3883,9 +3999,13 @@ namespace InfinityScript
         {
             Function.SetEntRef(entity.EntRef);
             if (ignorePlayer != null)
+            {
                 Function.Call(ScriptNames.FunctionList.playsoundtoteam, sound, team, ignorePlayer);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.playsoundtoteam, sound, team);
+            }
         }
 
         public static bool SoundExists(string alias)
@@ -4129,9 +4249,14 @@ namespace InfinityScript
         public static bool BulletTracePassed(Vector3 start, Vector3 end, bool hitCharacters, Entity ignore = null)
         {
             if (ignore != null)
+            {
                 Function.Call(ScriptNames.FunctionList.bullettracepassed, start, end, hitCharacters, ignore);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.bullettracepassed, start, end, hitCharacters);
+            }
+
             return (uint)Convert.ToInt32(Function.GetReturns()) > 0U;
         }
 
@@ -4139,9 +4264,14 @@ namespace InfinityScript
         {
             Function.SetEntRef(entity.EntRef);
             if (ignore != null)
+            {
                 Function.Call(ScriptNames.FunctionList.damageconetrace, origin, ignore);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.damageconetrace, origin);
+            }
+
             return (float)Function.GetReturns();
         }
 
@@ -4161,22 +4291,36 @@ namespace InfinityScript
         {
             Function.SetEntRef(entity.EntRef);
             if (ignore != null)
+            {
                 Function.Call(ScriptNames.FunctionList.sightconetrace, position, ignore);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.sightconetrace, position);
+            }
+
             return (float)Function.GetReturns();
         }
 
         public static bool SightTracePassed(Vector3 start, Vector3 end, bool hitCharacters, params Entity[] ignore)
         {
             if (ignore.Length == 0)
+            {
                 Function.Call(ScriptNames.FunctionList.sighttracepassed, start, end, hitCharacters);
+            }
             else if (ignore.Length == 1)
+            {
                 Function.Call(ScriptNames.FunctionList.sighttracepassed, start, end, hitCharacters, ignore[0]);
+            }
             else if (ignore.Length == 2)
+            {
                 Function.Call(ScriptNames.FunctionList.sighttracepassed, start, end, hitCharacters, ignore[0], ignore[1]);
+            }
             else if (ignore.Length == 3)
+            {
                 Function.Call(ScriptNames.FunctionList.sighttracepassed, start, end, hitCharacters, ignore[0], ignore[1], ignore[2]);
+            }
+
             return (uint)Convert.ToInt32(Function.GetReturns()) > 0U;
         }
 
@@ -4398,9 +4542,13 @@ namespace InfinityScript
         {
             Function.SetEntRef(entity.EntRef);
             if (carrier != null)
+            {
                 Function.Call(ScriptNames.FunctionList.setsentrycarrier, carrier);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.setsentrycarrier);
+            }
         }
 
         public static void SetTurretMinimapVisible(this Entity entity, bool visible)
@@ -4717,9 +4865,14 @@ namespace InfinityScript
         public static Entity MagicBullet(string weapon, Vector3 start, Vector3 end, Entity owner = null)
         {
             if (owner != null)
+            {
                 Function.Call(ScriptNames.FunctionList.magicbullet, weapon, start, end, owner);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.magicbullet, weapon, start, end);
+            }
+
             return (Entity)Function.GetReturns();
         }
 
@@ -4857,14 +5010,22 @@ namespace InfinityScript
         public static void FireWeapon(this Entity vehicle, string barrelTag = "", Entity targetEnt = null, Vector3? targetOffset = null)
         {
             Function.SetEntRef(vehicle.EntRef);
-            if (barrelTag == "" && targetEnt == null && !targetOffset.HasValue)
+            if (string.IsNullOrEmpty(barrelTag) && targetEnt == null && !targetOffset.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.fireweapon);
-            else if (barrelTag != "" && targetEnt == null)
+            }
+            else if (!string.IsNullOrEmpty(barrelTag) && targetEnt == null)
+            {
                 Function.Call(ScriptNames.FunctionList.fireweapon, barrelTag);
-            else if (barrelTag != "" && targetEnt != null && !targetOffset.HasValue)
+            }
+            else if (!string.IsNullOrEmpty(barrelTag) && targetEnt != null && !targetOffset.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.fireweapon, barrelTag, targetEnt);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.fireweapon, barrelTag, targetEnt, targetOffset.HasValue ? (Parameter)targetOffset.GetValueOrDefault() : null);
+            }
         }
 
         public static void FreeVehicle(this Entity vehicle)
@@ -4918,7 +5079,10 @@ namespace InfinityScript
         public static void JoltBody(this Entity vehicle, Vector3 joltPosition, float intensity, float fraction = 0.0f, float deceleration = 0.0f)
         {
             if (fraction > 1.0)
+            {
                 fraction = 1f;
+            }
+
             Function.SetEntRef(vehicle.EntRef);
             Function.Call(ScriptNames.FunctionList.joltbody, joltPosition, intensity, fraction, deceleration);
         }
@@ -5041,9 +5205,13 @@ namespace InfinityScript
         {
             Function.SetEntRef(vehicle.EntRef);
             if (offset.HasValue)
+            {
                 Function.Call(ScriptNames.FunctionList.setturrettargetent, target, offset.HasValue ? (Parameter)offset.GetValueOrDefault() : null);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.setturrettargetent, target);
+            }
         }
 
         public static void SetTurretTargetVec(this Entity vehicle, Vector3 target)
@@ -5061,10 +5229,14 @@ namespace InfinityScript
         public static void SetVehicleLookAtText(this Entity vehicle, string text1, string text2 = "")
         {
             Function.SetEntRef(vehicle.EntRef);
-            if (text2 != "")
+            if (!string.IsNullOrEmpty(text2))
+            {
                 Function.Call(ScriptNames.FunctionList.setvehiclelookattext, text1, text2);
+            }
             else
+            {
                 Function.Call(ScriptNames.FunctionList.setvehiclelookattext, text1);
+            }
         }
 
         public static void SetVehicleTeam(this Entity vehicle, string team)

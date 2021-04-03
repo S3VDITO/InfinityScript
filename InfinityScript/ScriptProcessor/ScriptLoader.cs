@@ -1,10 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-
-namespace InfinityScript
+﻿namespace InfinityScript
 {
+    using System;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+
     public class ScriptLoader
     {
         public static void Initialize()
@@ -74,10 +74,14 @@ namespace InfinityScript
         private static Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             if (args.Name.Contains("CitizenSHManager"))
+            {
                 return Assembly.GetExecutingAssembly();
+            }
 
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies().Where(_assembly => _assembly.FullName == args.Name))
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies().Where(assembly => assembly.FullName == args.Name))
+            {
                 return assembly;
+            }
 
             return null;
         }

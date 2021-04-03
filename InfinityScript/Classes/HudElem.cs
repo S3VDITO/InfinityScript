@@ -1,28 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#pragma warning disable SA1300 // Element should begin with upper-case letter
+#pragma warning disable SA1602 // Enumeration items should be documented
 
 namespace InfinityScript
 {
+    using System;
+    using System.Collections.Generic;
+
     public class HudElem
     {
-        internal string _shader = "";
         private static HudElem _uiParent;
+
         private HudElem _parent;
         private int _xOffset;
         private int _yOffset;
         private string _point;
         private string _relativePoint;
 
-        public Entity Entity { get; set; }
-
-        public static HudElem UIParent
+        internal HudElem(Entity entity)
         {
-            get
-            {
-                if (_uiParent == null)
-                    _uiParent = new HudElem();
-                return _uiParent;
-            }
+            Entity = entity;
+            Children = new List<HudElem>();
         }
 
         private HudElem()
@@ -31,13 +28,77 @@ namespace InfinityScript
             Children = new List<HudElem>();
         }
 
-        internal HudElem(Entity entity)
+        public enum HorzAlignments
         {
-            Entity = entity;
-            Children = new List<HudElem>();
+            SubLeft,
+            Left,
+            Center,
+            Right,
+            Fullscreen,
+            NoScale,
+            AlignTo640,
+            Center_SafeArea,
+            Center_Adjustable,
+            Left_Adjustable,
+            Right_Adjustable,
         }
 
-        public static HudElem GetHudElem(int entRef) =>  new HudElem(new Entity(entRef));
+        public enum VertAlignments
+        {
+            SubTop,
+            Top,
+            Middle,
+            Bottom,
+            Fullscreen,
+            NoScale,
+            AlignTo640,
+            Center_SafeArea,
+            Center_Adjustable,
+            Top_Adjustable,
+            Bottom_Adjustable,
+        }
+
+        public enum XAlignments
+        {
+            Left,
+            Center,
+            Right,
+        }
+
+        public enum YAlignments
+        {
+            Top,
+            Middle,
+            Bottom,
+        }
+
+        public enum Fonts
+        {
+            Big,
+            Bold,
+            ExtraBig,
+            HudBig,
+            HudSmall,
+            Normal,
+            Objective,
+            Small,
+            Default,
+        }
+
+        public static HudElem UIParent
+        {
+            get
+            {
+                if (_uiParent == null)
+                {
+                    _uiParent = new HudElem();
+                }
+
+                return _uiParent;
+            }
+        }
+
+        public Entity Entity { get; set; }
 
         public float X
         {
@@ -51,6 +112,7 @@ namespace InfinityScript
                         return Entity.GetField(0) != null ? (float)Entity.GetField(0) : 0.0f;
                 }
             }
+
             set
             {
                 Entity.SetField(0, value);
@@ -62,7 +124,9 @@ namespace InfinityScript
             get
             {
                 if (Entity == null)
+                {
                     return 0.0f;
+                }
 
                 return (float)Entity.GetField(1);
             }
@@ -74,7 +138,9 @@ namespace InfinityScript
             get
             {
                 if (Entity == null)
+                {
                     return 0.0f;
+                }
 
                 return (float)Entity.GetField(2);
             }
@@ -86,7 +152,9 @@ namespace InfinityScript
             get
             {
                 if (Entity == null)
+                {
                     return 0.0f;
+                }
 
                 return (float)Entity.GetField(3);
             }
@@ -104,12 +172,16 @@ namespace InfinityScript
             get
             {
                 if (Entity?.GetField(5) == null)
+                {
                     return XAlignments.Center;
+                }
 
                 string lowerInvariant = ((string)Entity.GetField(5)).ToLowerInvariant();
 
                 if (lowerInvariant == "left")
+                {
                     return XAlignments.Left;
+                }
 
                 return lowerInvariant == "right" ? XAlignments.Right : XAlignments.Center;
             }
@@ -121,12 +193,16 @@ namespace InfinityScript
             get
             {
                 if (Entity?.GetField(6) == null)
+                {
                     return YAlignments.Middle;
+                }
 
                 string lowerInvariant = ((string)Entity.GetField(6)).ToLowerInvariant();
 
                 if (lowerInvariant == "top")
+                {
                     return YAlignments.Top;
+                }
 
                 return lowerInvariant == "bottom" ? YAlignments.Bottom : YAlignments.Middle;
             }
@@ -138,7 +214,9 @@ namespace InfinityScript
             get
             {
                 if (Entity?.GetField(7) == null)
+                {
                     return HorzAlignments.NoScale;
+                }
 
                 switch (((string)Entity.GetField(7)).ToLowerInvariant())
                 {
@@ -174,10 +252,14 @@ namespace InfinityScript
             get
             {
                 if (Entity == null)
+                {
                     return VertAlignments.NoScale;
+                }
 
                 if (Entity.GetField(8) == null)
+                {
                     return VertAlignments.NoScale;
+                }
 
                 switch (((string)Entity.GetField(8)).ToLowerInvariant())
                 {
@@ -286,11 +368,34 @@ namespace InfinityScript
             set => Entity.SetField(11, value);
         }
 
-        public Parameter GetField(string name) => Entity.GetField(name);
+        public int Width { get; set; }
 
-        public Parameter GetField(int index) => Entity.GetField(index);
+        public int Height { get; set; }
 
-        public void SetField(string name, Parameter value) =>  Entity.SetField(name, value);
+        public HudElem Parent
+        {
+            get => _parent;
+            set
+            {
+                _parent?.Children.Remove(this);
+                _parent = value;
+                _parent.Children.Add(this);
+            }
+        }
+
+        public string Shader
+        {
+            get => ShaderI;
+            set
+            {
+                this.SetShader(value, 64, 64);
+                ShaderI = value;
+            }
+        }
+
+        public List<HudElem> Children { get; set; }
+
+        internal string ShaderI { get; set; } = string.Empty;
 
         public static HudElem CreateFontString(Entity client, Fonts font, float fontScale)
         {
@@ -330,24 +435,20 @@ namespace InfinityScript
             if (shader != null)
             {
                 hud.SetShader(shader, width, height);
-                hud._shader = shader;
+                hud.ShaderI = shader;
             }
 
             return hud;
         }
 
-        public List<HudElem> Children { get; set; }
+        public static HudElem GetHudElem(int entRef) =>
+            new HudElem(new Entity(entRef));
 
-        public HudElem Parent
-        {
-            get => _parent;
-            set
-            {
-                _parent?.Children.Remove(this);
-                _parent = value;
-                _parent.Children.Add(this);
-            }
-        }
+        public Parameter GetField(string name) => Entity.GetField(name);
+
+        public Parameter GetField(int index) => Entity.GetField(index);
+
+        public void SetField(string name, Parameter value) => Entity.SetField(name, value);
 
         public void SetPoint(string point) => SetPoint(point, point, 0, 0, 0);
 
@@ -365,7 +466,9 @@ namespace InfinityScript
             relativePoint = relativePoint.ToLowerInvariant();
 
             if (moveTime > 0)
+            {
                 this.MoveOverTime(moveTime);
+            }
 
             _xOffset = xOffset;
             _yOffset = yOffset;
@@ -375,25 +478,43 @@ namespace InfinityScript
             AlignY = YAlignments.Middle;
 
             if (point.Contains("top"))
+            {
                 AlignY = YAlignments.Top;
+            }
             else if (point.Contains("bottom"))
+            {
                 AlignY = YAlignments.Bottom;
+            }
+
             if (point.Contains("left"))
+            {
                 AlignX = XAlignments.Left;
+            }
             else if (point.Contains("right"))
+            {
                 AlignX = XAlignments.Right;
+            }
 
             HorzAlignments horzAlignments = HorzAlignments.Center_Adjustable;
             VertAlignments vertAlignments = VertAlignments.Middle;
 
             if (relativePoint.Contains("top"))
+            {
                 vertAlignments = VertAlignments.Top_Adjustable;
+            }
             else if (relativePoint.Contains("bottom"))
+            {
                 vertAlignments = VertAlignments.Bottom_Adjustable;
+            }
+
             if (relativePoint.Contains("left"))
+            {
                 horzAlignments = HorzAlignments.Left_Adjustable;
+            }
             else if (relativePoint.Contains("right"))
+            {
                 horzAlignments = HorzAlignments.Right_Adjustable;
+            }
 
             if (Parent.Entity == null)
             {
@@ -456,78 +577,9 @@ namespace InfinityScript
         private void UpdateChildren()
         {
             foreach (HudElem child in Children)
-                child.SetPoint(child._point, child._relativePoint, child._xOffset, child._yOffset);
-        }
-
-        public int Width { get; set; }
-
-        public int Height { get; set; }
-
-        public string Shader
-        {
-            get => _shader;
-            set
             {
-                this.SetShader(value, 64, 64);
-                _shader = value;
+                child.SetPoint(child._point, child._relativePoint, child._xOffset, child._yOffset);
             }
-        }
-
-        public enum HorzAlignments
-        {
-            SubLeft,
-            Left,
-            Center,
-            Right,
-            Fullscreen,
-            NoScale,
-            AlignTo640,
-            Center_SafeArea,
-            Center_Adjustable,
-            Left_Adjustable,
-            Right_Adjustable,
-        }
-
-        public enum VertAlignments
-        {
-            SubTop,
-            Top,
-            Middle,
-            Bottom,
-            Fullscreen,
-            NoScale,
-            AlignTo640,
-            Center_SafeArea,
-            Center_Adjustable,
-            Top_Adjustable,
-            Bottom_Adjustable,
-        }
-
-        public enum XAlignments
-        {
-            Left,
-            Center,
-            Right,
-        }
-
-        public enum YAlignments
-        {
-            Top,
-            Middle,
-            Bottom,
-        }
-
-        public enum Fonts
-        {
-            Big,
-            Bold,
-            ExtraBig,
-            HudBig,
-            HudSmall,
-            Normal,
-            Objective,
-            Small,
-            Default,
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
 
-
 [assembly: AssemblyTitle("InfinityScript")]
 [assembly: AssemblyDescription("An interface to provide modding support to IW5/TeknoMW3 v2.8.0.4")]
 [assembly: AssemblyConfiguration("")]

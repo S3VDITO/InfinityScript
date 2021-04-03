@@ -24,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>stylecop\common.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -45,6 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Base\CallType.cs" />
+    <Compile Include="Base\ChatType.cs" />
+    <Compile Include="Base\EventEat.cs" />
+    <Compile Include="Base\ServerCommand.cs" />
     <Compile Include="Base\GameInterface.cs" />
     <Compile Include="Base\Log.cs" />
     <Compile Include="Base\Logging\ConsoleLogListener.cs" />
@@ -68,8 +73,16 @@
     <Compile Include="ScriptProcessor\ScriptNames.cs" />
     <Compile Include="ScriptProcessor\ScriptProcessor.cs" />
     <Compile Include="ScriptProcessor\ThreadScript.cs" />
+    <Compile Include="Base\VariableType.cs" />
     <Compile Include="Scripts\GameLogger.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="stylecop\common.ruleset" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.118\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

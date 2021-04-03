@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace InfinityScript
+﻿namespace InfinityScript
 {
+    using System;
+
     internal static class SHManager
     {
         public static void Initialize()
@@ -35,9 +35,11 @@ namespace InfinityScript
             }
         }
 
-        public static void Shutdown() => ScriptProcessor.RunAll(script => script.OnExitLevel());
+        public static void Shutdown() =>
+            ScriptProcessor.RunAll(script => script.OnExitLevel());
 
-        public static void LoadScript(string scriptName) => ScriptLoader.LoadAssemblies("scripts", scriptName);
+        public static void LoadScript(string scriptName) =>
+            ScriptLoader.LoadAssemblies("scripts", scriptName);
 
         public static bool HandleSay(int clientNum, string clientName, ref string message, int team)
         {
@@ -50,24 +52,30 @@ namespace InfinityScript
             {
                 // Run Script.OnSay3 (by reference, with team and eat)
                 if (eatscript)
+                {
                     return;
+                }
 
-                BaseScript.EventEat handled = script.OnSay3(entity, team == 0 ? BaseScript.ChatType.All : BaseScript.ChatType.Team, clientName, ref messageTemp);
+                EventEat handled = script.OnSay3(entity, team == 0 ? ChatType.All : ChatType.Team, clientName, ref messageTemp);
 
-                eatgame = eatgame || handled.HasFlag(BaseScript.EventEat.EatGame);
-                eatscript = handled.HasFlag(BaseScript.EventEat.EatScript);
+                eatgame = eatgame || handled.HasFlag(EventEat.EatGame);
+                eatscript = handled.HasFlag(EventEat.EatScript);
 
                 // Run Script.OnSay2 (normal, with eat)
                 if (eatscript)
+                {
                     return;
+                }
 
                 handled = script.OnSay2(entity, clientName, messageTemp);
-                eatgame = eatgame || handled.HasFlag(BaseScript.EventEat.EatGame);
-                eatscript = handled.HasFlag(BaseScript.EventEat.EatScript);
+                eatgame = eatgame || handled.HasFlag(EventEat.EatGame);
+                eatscript = handled.HasFlag(EventEat.EatScript);
 
                 // Run Script.OnSay (normal, without eat)
                 if (eatscript)
+                {
                     return;
+                }
 
                 script.OnSay(entity, clientName, messageTemp);
             });
@@ -98,14 +106,22 @@ namespace InfinityScript
                     break;
                 case CallType.PlayerDamage:
                     if (paras[6].IsNull)
+                    {
                         paras[6] = new Vector3(0.0f, 0.0f, 0.0f);
+                    }
+
                     if (paras[7].IsNull)
+                    {
                         paras[7] = new Vector3(0.0f, 0.0f, 0.0f);
+                    }
+
                     ScriptProcessor.RunAll(script => script.OnPlayerDamage(entity, paras[0].As<Entity>(), paras[1].As<Entity>(), paras[2].As<int>(), paras[3].As<int>(), paras[4].As<string>(), paras[5].As<string>(), paras[6].As<Vector3>(), paras[7].As<Vector3>(), paras[8].As<string>()));
                     break;
                 case CallType.PlayerKilled:
                     if (paras[5].IsNull)
+                    {
                         paras[5] = new Vector3(0.0f, 0.0f, 0.0f);
+                    }
 
                     ScriptProcessor.RunAll(script => script.OnPlayerKilled(entity, paras[0].As<Entity>(), paras[1].As<Entity>(), paras[2].As<int>(), paras[3].As<string>(), paras[4].As<string>(), paras[5].As<Vector3>(), paras[6].As<string>()));
                     break;
@@ -115,7 +131,7 @@ namespace InfinityScript
                 case CallType.EndGame:
                     ScriptProcessor.RunAll(script => script.OnExitLevel());
                     break;
-            } 
+            }
         }
 
         public static void HandleNotify(int entity)
@@ -125,16 +141,18 @@ namespace InfinityScript
             Parameter[] paras = CollectParameters(numArgs);
 
             if (type == "touch")
+            {
                 return;
+            }
 
-            if (GameInterface.Script_GetObjectType(entity) == 21) // not an actual entity
+            if (GameInterface.Script_GetObjectType(entity) == 21)
             {
                 var entRef = GameInterface.Script_ToEntRef(entity);
                 var entObj = Entity.GetEntity(entRef);
 
                 entObj.HandleNotify(entity, type, paras);
             }
-            else if (GameInterface.Script_GetObjectType(entity) == 24) // not an actual entity
+            else if (GameInterface.Script_GetObjectType(entity) == 24)
             {
                 var entRef = GameInterface.Script_GetTempEntRef();
                 var entObj = Entity.GetEntity(entRef);
@@ -150,7 +168,9 @@ namespace InfinityScript
             string[] args = new string[GameInterface.Cmd_Argc()];
 
             for (int i = 0; i < args.Length; i++)
+            {
                 args[i] = GameInterface.Cmd_Argv(i);
+            }
 
             bool eat = false;
 
@@ -167,7 +187,9 @@ namespace InfinityScript
             string[] args = new string[GameInterface.Cmd_Argc_sv()];
 
             for (int i = 0; i < args.Length; i++)
+            {
                 args[i] = GameInterface.Cmd_Argv_sv(i);
+            }
 
             Entity entObj = Entity.GetEntity(entity);
             bool handled = false;
@@ -198,7 +220,9 @@ namespace InfinityScript
                     string error = script.OnPlayerRequestConnection(playerName, playerHWID, playerXUID, playerIP, playerSID, playerXNA);
 
                     if (string.IsNullOrEmpty(error))
+                    {
                         return;
+                    }
 
                     eat = true;
 
@@ -210,7 +234,7 @@ namespace InfinityScript
             catch (Exception ex)
             {
                 Utilities.PrintToConsole($"[InfinityScript] An error occurred during the handling of a client connecting!: {ex.Message}\nAdditional Info:{ex.Data}");
-                
+
                 return false;
             }
         }
@@ -252,5 +276,5 @@ namespace InfinityScript
 
             return paras;
         }
-    } 
+    }
 }

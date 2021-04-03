@@ -1,8 +1,10 @@
-﻿namespace InfinityScript
+﻿#pragma warning disable SA1300 // Element should begin with upper-case letter
+#pragma warning disable SA1602 // Enumeration items should be documented
+
+namespace InfinityScript
 {
     internal static class ScriptNames
     {
-        /// CallID can not negative numbers
         internal enum FunctionList : uint
         {
             precacheturret = 1,
